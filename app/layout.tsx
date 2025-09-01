@@ -6,6 +6,14 @@ export const metadata: Metadata = {
   description: "Experience authentic Ghanaian cuisine at Edem's Eatery in Liverpool, NSW. Enjoy traditional dishes like Jollof Rice, Waakye, Banku, and more. 100% Halal certified. Dine-in, takeaway, and catering available.",
   keywords: "Ghanaian restaurant, African food Liverpool, Halal restaurant Sydney, Jollof rice, Waakye, Banku, Fufu, African cuisine NSW",
   authors: [{ name: "Edem's Eatery" }],
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon.png', type: 'image/png' }
+    ],
+    apple: '/apple-icon.png',
+    shortcut: '/favicon.ico'
+  },
   openGraph: {
     title: "Edem's Eatery - Authentic Ghanaian Cuisine",
     description: "Where Every Bite Tells a Story of Heritage, Flavor & Passion",
@@ -54,9 +62,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-      </head>
       <body className="antialiased">
         {children}
       </body>

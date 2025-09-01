@@ -88,6 +88,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
+          className="pt-8 md:pt-0"
         >
           <motion.h1 
             className="text-5xl md:text-7xl lg:text-8xl font-bold font-heading text-white mb-6"
@@ -196,16 +197,6 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-20 md:bottom-16 left-1/2 transform -translate-x-1/2 z-30"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-      >
-        <div className="w-6 h-10 border-2 border-secondary rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-secondary rounded-full mt-2"></div>
-        </div>
-      </motion.div>
     </section>
   );
 };
