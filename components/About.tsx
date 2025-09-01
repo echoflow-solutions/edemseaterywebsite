@@ -34,7 +34,7 @@ const About = () => {
           className="text-center mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold font-heading text-primary mb-4">
-            Welcome to <span className="text-secondary text-glow">Edem&apos;s Eatery</span>
+            Welcome to <span className="text-secondary text-glow whitespace-nowrap">Edem&apos;s Eatery</span>
           </h2>
           <div className="w-24 h-1 bg-secondary mx-auto shimmer"></div>
         </motion.div>
