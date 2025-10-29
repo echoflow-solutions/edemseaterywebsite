@@ -38,7 +38,7 @@ const Gallery = () => {
   };
 
   return (
-    <section id="gallery" className="py-20 bg-white relative overflow-hidden">
+    <section id="gallery" className="py-20 bg-white relative overflow-hidden scroll-mt-28 lg:scroll-mt-36 xl:scroll-mt-40">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-secondary rounded-full filter blur-3xl"></div>

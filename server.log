@@ -1,0 +1,95 @@
+
+> edems-eatery@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.2
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.10.236:3000
+
+ ✓ Starting...
+ ✓ Ready in 1303ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3.8s (1412 modules)
+ GET / 200 in 4332ms
+ ✓ Compiled in 455ms (661 modules)
+ GET / 200 in 290ms
+ GET / 200 in 236ms
+ ✓ Compiled in 361ms (661 modules)
+ GET / 200 in 61ms
+ GET / 200 in 64ms
+ ✓ Compiled in 566ms (1412 modules)
+ GET / 200 in 145ms
+ GET / 200 in 147ms
+ ✓ Compiled in 382ms (1412 modules)
+ GET / 200 in 103ms
+ GET / 200 in 105ms
+ ✓ Compiled in 765ms (1422 modules)
+ GET / 200 in 100ms
+ GET / 200 in 102ms
+ GET / 200 in 305ms
+ GET / 200 in 230ms
+ GET / 200 in 173ms
+ ✓ Compiled in 656ms (1422 modules)
+ GET / 200 in 214ms
+ GET / 200 in 216ms
+ GET / 200 in 85ms
+ GET / 200 in 83ms
+ ✓ Compiled in 367ms (1422 modules)
+ GET / 200 in 125ms
+ GET / 200 in 143ms
+ GET / 200 in 152ms
+ GET / 200 in 163ms
+ ⨯ Error: Could not find the module "/Users/bernardadjei/BUSINESS STARTUPS/Edem's Eatery Website/edems-eatery/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '3563117765'
+}
+ ⨯ Error: Could not find the module "/Users/bernardadjei/BUSINESS STARTUPS/Edem's Eatery Website/edems-eatery/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '3876385637'
+}
+ ⨯ Error: Could not find the module "/Users/bernardadjei/BUSINESS STARTUPS/Edem's Eatery Website/edems-eatery/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '3876385637'
+}
+ ⨯ Error: Could not find the module "/Users/bernardadjei/BUSINESS STARTUPS/Edem's Eatery Website/edems-eatery/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '3876385637'
+}
+ ⨯ Error: Could not find the module "/Users/bernardadjei/BUSINESS STARTUPS/Edem's Eatery Website/edems-eatery/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '3563117765'
+}
+ ⨯ Error: Could not find the module "/Users/bernardadjei/BUSINESS STARTUPS/Edem's Eatery Website/edems-eatery/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '3563117765'
+}
+ ⨯ [TypeError: __webpack_modules__[moduleId] is not a function] {
+  digest: '2751434766'
+}
+ ⨯ Error: Could not find the module "/Users/bernardadjei/BUSINESS STARTUPS/Edem's Eatery Website/edems-eatery/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js#SegmentViewNode" in the React Client Manifest. This is probably a bug in the React Server Components bundler.
+    at stringify (<anonymous>) {
+  digest: '3563117765'
+}
+[TypeError: __webpack_modules__[moduleId] is not a function]
+ ⨯ [TypeError: __webpack_modules__[moduleId] is not a function]
+ ⨯ [TypeError: __webpack_modules__[moduleId] is not a function] {
+  page: '/'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 2.1s (1748 modules)
+ GET / 200 in 899ms
+ GET / 200 in 915ms
+ GET / 200 in 913ms
+ GET / 200 in 914ms
+ GET / 200 in 47ms
+ GET / 200 in 95ms
+ GET / 500 in 5354ms
+ GET / 200 in 827ms
+ GET / 200 in 827ms
+ GET / 200 in 305ms
+ GET / 200 in 167ms
+ GET / 200 in 156ms
+ GET / 200 in 203ms

@@ -25,12 +25,7 @@ const FloatingOrderButton = () => {
           exit={{ opacity: 0, scale: 0 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => {
-            const contactSection = document.getElementById('contact');
-            if (contactSection) {
-              contactSection.scrollIntoView({ behavior: 'smooth' });
-            }
-          }}
+          onClick={() => window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web'}
           className="fixed bottom-8 right-8 z-40 bg-secondary text-primary rounded-full shadow-2xl glow group overflow-hidden cursor-pointer"
         >
           <div className="relative px-6 py-4">

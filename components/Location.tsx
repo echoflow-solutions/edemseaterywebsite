@@ -23,7 +23,7 @@ const Location = () => {
   ];
 
   return (
-    <section id="contact" className="py-20 bg-white relative overflow-hidden">
+    <section id="contact" className="py-20 bg-white relative overflow-hidden scroll-mt-28 lg:scroll-mt-36 xl:scroll-mt-40">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-secondary to-transparent rounded-full filter blur-3xl"></div>
@@ -178,6 +178,7 @@ const Location = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web'}
                 className="px-6 py-4 bg-secondary text-primary rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300 shadow-lg"
               >
                 ORDER FOR PICKUP
@@ -185,6 +186,7 @@ const Location = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web'}
                 className="px-6 py-4 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-all duration-300 shadow-lg"
               >
                 ORDER FOR DELIVERY

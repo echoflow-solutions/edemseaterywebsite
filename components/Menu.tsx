@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { UtensilsCrossed } from 'lucide-react';
+import Image from 'next/image';
 import MenuPDFViewer from './MenuPDFViewer';
 
 const Menu = () => {
-  const [activeTab, setActiveTab] = useState('appetizers');
   const [isPDFOpen, setIsPDFOpen] = useState(false);
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -15,67 +16,69 @@ const Menu = () => {
 
   const menuData = {
     appetizers: [
-      { name: 'Chinchinga (Suya/Kebab)', price: '$10.00', description: 'Ghanaian-style beef or chicken skewers seasoned and served with a spicy rub (3 pcs)' },
-      { name: 'Yam Chips', price: '$10.00', description: 'Thick-cut yam slices fried until golden, served with a spicy dipping sauce (6pcs)' },
-      { name: 'Spring Rolls', price: '$7.00', description: 'Crispy spring rolls stuffed with seasoned vegetables and a hint of local spices, served with a tangy chili dipping sauce (5pcs)' },
-      { name: 'Kelewele', price: '$10.00', description: 'Spiced fried ripped plantain. Peanuts (+$2)' },
-      { name: 'Kosua ne Meko', price: '$5.00', description: 'Boiled egg with chilli (1)' },
-    ],
-    mains: [
-      { name: 'Jollof Rice', price: '$25.00', description: 'Ghanaian style tomato rice infused with local spices, served with garden salad & shito (black fish chilli sauce) + your choice of protein: chicken, fish (+$5), lamb (+$3), beef stew (+$3)' },
-      { name: 'Fried Rice', price: '$25.00', description: 'Ghanaian-style fried rice contains vegetables and a hint of local spices, served with a side of green chilli and with garden salad + your choice of protein: chicken, fish (+$5), lamb (+$3), beef stew (+$3)' },
-      { name: 'Waakye (Rice + beans)', price: '$28.00', description: 'A unique Ghanaian rice and bean. Served with gari, spaghetti, beef stew (tomato beef stew), shito (black fish chilli sauce) + served with garden salad' },
-      { name: 'Banku or Kenkey', price: 'From $28.00', description: 'Fermented corn and cassava dough meal, served with a selected side of your choice. Side options: Tilapia soup ($30), Okra Soup and beef ($30), Fried fish and assorted chilli ($28), Grilled tilapia and assorted chili ($30), Grilled barramundi and assorted chili ($40)' },
-      { name: 'Fufu', price: 'From $28.00', description: 'Pounded cassava and plantain, served with a selected soup of choice. Side options: Tilapia soup ($30), Goat meat pepper soup ($30), Light Soup with chicken ($28), Peanut Soup with beef ($28), Peanut Soup with chicken ($28)' },
-      { name: 'Semolina Fufu or Eba or White Rice or Pounded Yam + Egusi Stew', price: '$30.00', description: 'Semolina fufu is a thick, dough-like dish made from semolina flour and water. Eba (garri) is a starchy food made from dried cassava. Jazmine rice served. Spiced spinach is cooked in a rich palm oil base with egusi (melon seeds) w/ beef and dried fish' },
-      { name: 'White Rice + Beef Stew', price: '$28.00', description: 'Jazmine rice served with beef stew + garden salad' },
-      { name: 'Red Red (Kokoo + Beans)', price: '$25.00', description: 'Fried ripped plantain served with black-eyed peas stew (sauce)' },
-      { name: 'Omotuo', price: 'From $28.00', description: 'Soft, sticky rice balls served with a rich side of your choice. Side options: Tilapia soup ($30), Goat meat pepper soup ($30), Light Soup with chicken ($28), Peanut Soup with beef ($28), Peanut Soup with chicken ($28)' },
-      { name: 'Sadza/Ugali', price: '$28.00', description: 'A staple African dish made from finely ground white maize, cooked to a smooth, thick consistency. Served with your choice of meat & vegetable relish, such as beef stew or chicken and sautéed greens' },
-      { name: 'Ampesi + Kontomire', price: '$35.00', description: 'Kontomire stew is a popular and healthy Ghanaian dish made with cocoyam leaves & spinach. It\'s full of flavor and nutrients and is served with beef & ampesi which is boiled yam or plantain & a boiled egg' },
+      { name: 'Chinchinga (Suya/Kebab)(3pcs)', price: '$10.00', description: 'Ghanaian-style beef or chicken skewers seasoned and served with a spicy sauce', image: '/media/kebab.jpg' },
+      { name: 'Yam Chips (6pcs)', price: '$10.00', description: 'Thick-cut yam slices fried until golden, served with a spicy dipping sauce', image: null },
+      { name: 'Spring Rolls (5pcs)', price: '$7.00', description: 'Crispy spring rolls stuffed with seasoned vegetables and a hint of local spices', image: '/media/spring-rolls.jpg' },
+      { name: 'Kelewele', price: '$10.00', description: 'Spiced fried ripped plantain', image: '/media/beans-plantain.jpg' },
+      { name: 'Kosua ne Meko', price: '$5.00', description: 'Boiled egg with chilli', image: '/media/egg-chilli.jpg' },
     ],
     kidsMenu: [
-      { name: 'Chips', price: '$8.00', description: 'Crispy fried potato chips' },
-      { name: 'Chicken + Chips', price: '$15.00', description: 'Crispy fried potato chips + Fried Chicken' },
+      { name: 'Chips', price: '$8.00', description: 'Crispy fried potato chips', image: null },
+      { name: 'Chicken + Chips', price: '$15.00', description: 'Crispy fried potato chips + Fried chicken', image: null },
     ],
-    desserts: [
-      { name: 'Boflot (Puff Puff)', price: '$10.00', description: 'Light and fluffy fried dough balls with a hint of sweetness, perfect for breakfast or as a snack. Crispy on the outside and soft on the inside, they\'re delicious on their own or with toppings of your choice (3pc). Flavours: Cinnamon Sugar (+$2), Cookie + Cream (+$2), Biscoff (+$2)' },
-      { name: 'Waffles', price: '$12.00', description: 'Flavours: Cinnamon Sugar + ice cream, Cookie + Cream + ice cream, Biscoff + ice cream, Strawberries, bananas & chocolate + ice cream' },
-      { name: 'Fries', price: '$8.00', description: 'Flavored with different choices and assorted chili' },
-    ],
-    drinks: [
-      { name: 'Water', price: '$2.00', description: '' },
-      { name: 'Soft drink (Cans)', price: '$3.00', description: '' },
-      { name: 'Soft drink (Bottle)', price: '$4.50', description: '' },
-      { name: 'Juice', price: '$4.00', description: '' },
-      { name: 'Malt', price: '$4.50', description: '' },
-      { name: 'Sobolo (Hibiscus drink)', price: '$4.00', description: '' },
-      { name: 'Emudro (Ginger drink)', price: '$4.00', description: '' },
+    mains: [
+      { name: 'Jollof Rice', price: '$25.00', description: 'Ghanaian style tomato rice infused with local spices, served with garden salad', image: '/media/jollof-chicken.jpg' },
+      { name: 'Fried Rice', price: '$25.00', description: 'Ghanaian-style fried rice contains vegetables and a hint of local spices', image: '/media/fried-rice.jpg' },
+      { name: 'Waakye (Rice + Beans)', price: '$28.00', description: 'A unique Ghanaian rice and bean dish. Served with gari, spaghetti, beef stew', image: '/media/waakye.jpg' },
+      { name: 'Banku', price: '$28.00', description: 'Fermented corn and cassava dough meal, served with a selected side of your choice', image: '/media/banku-tilapia.jpg' },
+      { name: 'Kenkey', price: '$28.00', description: 'Kenkey is a fermented maize dough that is a staple food in Ghana, served with fish and pepper', image: null },
+      { name: 'Fufu', price: '$28.00', description: 'Pounded cassava and plantain, served with a selected soup of choice', image: '/media/fufu.jpg' },
+      { name: 'Ampesi + Kontomire', price: '$35.00', description: 'Kontomire stew is a popular and healthy Ghanaian dish made with cocoyam leaves', image: null },
+      { name: 'Omotuo', price: '$28.00', description: 'Soft, sticky rice balls served with a rich side of your choice', image: null },
+      { name: 'Red Red (Kokoo + Beans)', price: '$25.00', description: 'Fried ripped plantain served with black eyed peas stew (sauce)', image: null },
+      { name: 'Sadza/Ugali', price: '$28.00', description: 'A staple African dish made from finely ground white maize, cooked to a smooth consistency', image: null },
+      { name: 'Semolina Fufu + Egusi Stew', price: '$30.00', description: 'Semolina fufu is a thick, dough-like dish made from semolina flour and water', image: null },
+      { name: 'Eba + Egusi Stew', price: '$30.00', description: 'Eba (garri) is a starchy food made from dried cassava. Spiced spinach is cooked with egusi', image: null },
+      { name: 'Pounded Yam + Egusi Stew', price: '$30.00', description: 'Traditional Nigerian dish with pounded yam and egusi, a savory melon seed stew', image: null },
+      { name: 'White Rice + Beef Stew', price: '$28.00', description: 'Jazmine rice served with beef stew + garden salad', image: null },
     ],
     proteins: [
-      { name: 'Boiled egg', price: '$3.00', description: '' },
-      { name: 'Chicken', price: '$10.00', description: '' },
-      { name: 'Beef stew', price: '$7.00', description: '' },
-      { name: 'Goat', price: '$10.00', description: '' },
-      { name: 'Lamb cutlets', price: '$15.00', description: '' },
-      { name: 'Ghanaian meat pie', price: '$10.00', description: '' },
-      { name: 'Fried fish', price: '$15.00', description: '' },
-      { name: 'Grilled tilapia', price: '$25.00', description: '' },
-      { name: 'Grilled barramundi', price: '$35.00', description: '' },
+      { name: 'Boiled Egg', price: '$3.00', description: 'Perfect protein addition to any meal', image: null },
+      { name: 'Chicken', price: '$10.00', description: 'Succulent grilled or fried chicken', image: null },
+      { name: 'Beef Stew', price: '$7.00', description: 'Rich and flavorful beef stew', image: null },
+      { name: 'Goat', price: '$10.00', description: 'Tender goat meat', image: null },
+      { name: 'Lamb Cutlets', price: '$15.00', description: 'Juicy lamb cutlets grilled to perfection', image: null },
+      { name: 'Ghanaian Meat Pie', price: '$10.00', description: 'Savory pastry filled with spiced meat', image: null },
+      { name: 'Fried Fish', price: '$15.00', description: 'Crispy fried fish fillet', image: null },
+      { name: 'Grilled Tilapia', price: '$25.00', description: 'Fresh tilapia grilled with Ghanaian spices', image: null },
+      { name: 'Grilled Barramundi', price: '$35.00', description: 'Premium barramundi grilled to perfection', image: null },
+    ],
+    desserts: [
+      { name: 'Boflot (Puff Puff)(3pcs)', price: '$10.00', description: 'Light and fluffy fried dough balls with a hint of sweetness, perfect for dessert', image: null },
+      { name: 'Waffles', price: '$12.00', description: 'Golden crispy waffles served with syrup', image: '/media/waffles.jpg' },
+    ],
+    drinks: [
+      { name: 'Water', price: '$2.00', description: 'Refreshing bottled water', image: null },
+      { name: 'Softdrink (Cans)', price: '$3.00', description: 'Assorted canned soft drinks', image: null },
+      { name: 'Softdrink (Bottle)', price: '$4.50', description: 'Assorted bottled soft drinks', image: null },
+      { name: 'Juice', price: '$4.00', description: 'Fresh fruit juice', image: null },
+      { name: 'Malt', price: '$4.50', description: 'Rich malt drink', image: null },
+      { name: 'Sobolo (Hibiscus Drink)', price: '$4.00', description: 'Traditional hibiscus drink', image: null },
+      { name: 'Emudro (Ginger Drink)', price: '$4.00', description: 'Spicy ginger drink', image: null },
     ],
   };
 
-  const tabs = [
-    { id: 'appetizers', label: 'Appetizers' },
-    { id: 'mains', label: 'Main Courses' },
-    { id: 'kidsMenu', label: 'Kids Menu' },
-    { id: 'desserts', label: 'Desserts' },
-    { id: 'drinks', label: 'Drinks' },
-    { id: 'proteins', label: 'Protein Add-ons' },
+  const menuSections = [
+    { id: 'appetizers', label: 'APPETISERS', items: menuData.appetizers },
+    { id: 'kidsMenu', label: 'KIDS MENU', items: menuData.kidsMenu },
+    { id: 'mains', label: 'MAIN COURSE', items: menuData.mains },
+    { id: 'proteins', label: 'PROTEIN', items: menuData.proteins },
+    { id: 'desserts', label: 'DESSERT', items: menuData.desserts },
+    { id: 'drinks', label: 'DRINKS', items: menuData.drinks },
   ];
 
   return (
-    <section id="menu" className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+    <section id="menu" className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden scroll-mt-28 lg:scroll-mt-36 xl:scroll-mt-40">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
@@ -97,65 +100,82 @@ const Menu = () => {
           <div className="w-24 h-1 bg-secondary mx-auto shimmer"></div>
         </motion.div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {tabs.map((tab) => (
-            <motion.button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
-                activeTab === tab.id
-                  ? 'bg-secondary text-primary shadow-lg glow'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+        {/* Menu Sections - Continuous List */}
+        <div className="space-y-16">
+          {menuSections.map((section, sectionIndex) => (
+            <motion.div
+              key={section.id}
+              initial={{ opacity: 0, y: 50 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8, delay: sectionIndex * 0.2 }}
             >
-              {tab.label}
-            </motion.button>
+              {/* Section Header */}
+              <div className="text-center mb-8">
+                <h3 className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                  {section.label}
+                </h3>
+                <div className="w-20 h-1 bg-secondary mx-auto shimmer"></div>
+              </div>
+
+              {/* Section Items Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                {section.items.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={inView ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    onClick={() => {
+                      window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web';
+                    }}
+                  >
+                    {/* Image Section */}
+                    <div className="relative h-56 w-full overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full bg-gradient-to-br from-primary/10 to-secondary/10">
+                          <UtensilsCrossed size={64} className="text-secondary/40" />
+                        </div>
+                      )}
+
+                      {/* Price Badge */}
+                      <div className="absolute top-4 right-4 bg-secondary text-primary px-4 py-2 rounded-full font-bold text-lg shadow-lg glow">
+                        {item.price}
+                      </div>
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                        <span className="text-white font-bold text-lg bg-secondary/90 px-6 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                          Click to Order
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="p-5">
+                      <h3 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors duration-300 mb-2 line-clamp-2">
+                        {item.name}
+                      </h3>
+                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">{item.description}</p>
+                    </div>
+
+                    {/* Decorative corner element */}
+                    <div className="absolute -bottom-2 -right-2 w-24 h-24 bg-secondary/10 rounded-full filter blur-2xl group-hover:bg-secondary/30 transition-all duration-300"></div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           ))}
         </div>
-
-        {/* Menu Items */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto"
-          >
-            {menuData[activeTab as keyof typeof menuData].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-100 overflow-hidden"
-                whileHover={{ y: -5 }}
-              >
-                {/* Shimmer overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-secondary/5 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                
-                <div className="relative z-10">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-xl font-bold text-primary group-hover:text-secondary transition-colors duration-300">
-                      {item.name}
-                    </h3>
-                    <span className="text-2xl font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full">
-                      {item.price}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 leading-relaxed">{item.description}</p>
-                </div>
-
-                {/* Decorative corner element */}
-                <div className="absolute -bottom-2 -right-2 w-20 h-20 bg-secondary/10 rounded-full filter blur-2xl group-hover:bg-secondary/20 transition-all duration-300"></div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
 
         {/* View Full Menu Button */}
         <motion.div 

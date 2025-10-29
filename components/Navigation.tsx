@@ -9,6 +9,12 @@ const Navigation = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    // Scroll to top on page load
+    window.scrollTo(0, 0);
+
+    // Initialize scroll state based on current position
+    setScrolled(window.scrollY > 20);
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
@@ -32,36 +38,34 @@ const Navigation = () => {
   };
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
+    <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-primary/95 backdrop-blur-md shadow-lg shadow-secondary/20' 
+        scrolled
+          ? 'bg-primary/95 backdrop-blur-md shadow-lg shadow-secondary/20'
           : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24 lg:h-28">
+        <div className="flex items-center justify-between h-28 lg:h-36 xl:h-40">
           {/* Logo */}
           <motion.div 
             className="flex-shrink-0"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
           >
-            <img 
-              src="/media/logo.png" 
-              alt="Edem's Eatery Logo" 
-              className="h-16 md:h-20 lg:h-24 w-auto relative z-10"
+            <img
+              src="/media/logo-new.png"
+              alt="Edem's Eatery Logo"
+              className="h-24 md:h-28 lg:h-36 w-auto relative z-10"
               style={{
-                filter: 'drop-shadow(0 0 15px rgba(255, 193, 7, 0.4)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))',
+                filter: 'drop-shadow(0 0 20px rgba(255, 193, 7, 0.6)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.4)) brightness(1.1)',
               }}
             />
           </motion.div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-6">
+            <div className="ml-10 flex items-center space-x-6">
               {navItems.map((item, index) => (
                 <motion.a
                   key={item.label}
@@ -70,7 +74,8 @@ const Navigation = () => {
                     e.preventDefault();
                     handleNavClick(item.href);
                   }}
-                  className="text-white hover:text-secondary transition-colors duration-300 px-3 py-2 text-sm font-medium relative group"
+                  className="text-white hover:text-secondary transition-colors duration-300 px-3 py-3 text-lg font-bold relative group"
+                  style={{ textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
@@ -83,7 +88,10 @@ const Navigation = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-secondary text-primary px-6 py-2 rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300"
+                onClick={() => {
+                  window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web';
+                }}
+                className="bg-secondary text-primary px-6 py-3 rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300"
               >
                 ORDER NOW
               </motion.button>
@@ -123,12 +131,17 @@ const Navigation = () => {
               {item.label}
             </a>
           ))}
-          <button className="w-full bg-secondary text-primary px-6 py-3 rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300 mt-4">
+          <button
+            onClick={() => {
+              window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web';
+            }}
+            className="w-full bg-secondary text-primary px-6 py-3 rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300 mt-4"
+          >
             ORDER NOW
           </button>
         </div>
       </motion.div>
-    </motion.nav>
+    </nav>
   );
 };
 

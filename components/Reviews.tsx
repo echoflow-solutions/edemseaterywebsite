@@ -55,7 +55,7 @@ const Reviews = () => {
   };
 
   return (
-    <section id="reviews" className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+    <section id="reviews" className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden scroll-mt-28 lg:scroll-mt-36 xl:scroll-mt-40">
       {/* Background pattern */}
       <div className="absolute inset-0">
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/10 rounded-full filter blur-3xl"></div>

@@ -32,15 +32,15 @@ const Hero = () => {
     >
       {/* Background with gradient overlay */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80 z-10"></div>
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30"
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/85 via-primary/80 to-primary/75 z-10"></div>
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-40"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=2187')`,
+            backgroundImage: `url('/media/all1.png')`,
           }}
         ></div>
         {/* Animated gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary via-transparent to-transparent z-20"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-transparent to-transparent z-20"></div>
       </div>
 
       {/* Floating particles effect - only render after mount */}
@@ -141,12 +141,7 @@ const Hero = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                const contactSection = document.getElementById('contact');
-                if (contactSection) {
-                  contactSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
+              onClick={() => window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web'}
               className="relative px-8 py-4 bg-secondary text-primary rounded-full font-bold text-lg btn-shimmer glow overflow-hidden group cursor-pointer"
             >
               <span className="relative z-10">ORDER NOW - Delivery &amp; Pickup</span>
@@ -187,11 +182,11 @@ const Hero = () => {
           ].map((item, index) => (
             <motion.div
               key={index}
-              className="flex items-center justify-center gap-2 text-white/80"
+              className="flex items-center justify-center gap-3 text-white"
               whileHover={{ scale: 1.05, color: '#FFC107' }}
             >
-              <item.icon size={20} className="text-secondary" />
-              <span className="text-sm">{item.text}</span>
+              <item.icon size={24} className="text-secondary" />
+              <span className="text-base font-semibold" style={{ textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)' }}>{item.text}</span>
             </motion.div>
           ))}
         </motion.div>
