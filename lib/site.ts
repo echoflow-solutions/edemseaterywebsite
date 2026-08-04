@@ -16,7 +16,7 @@ export const RESTAURANT = {
   regionShort: 'Liverpool, NSW',
   phoneDisplay: '(02) 7238 8800',
   phoneHref: 'tel:0272388800',
-  email: 'info@edemseatery.com',
+  email: 'info@edemseatery.com.au',
   established: '2024',
   /** Short trading summary. Monday is closed, so never "7 days a week". */
   openingSummary: 'Open Tue – Sun',
