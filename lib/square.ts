@@ -110,14 +110,11 @@ export const createPaymentLink = async (
         redirect_url: input.redirectUrl,
         ask_for_shipping_address: false,
       },
-      ...(input.customerEmail || input.customerPhone
-        ? {
-            pre_populated_data: {
-              ...(input.customerEmail ? { buyer_email: input.customerEmail } : {}),
-              ...(input.customerPhone ? { buyer_phone_number: input.customerPhone } : {}),
-            },
-          }
-        : {}),
+      // No pre_populated_data here. Square rejects an order that sets both a
+      // fulfillment and buyer_email ("Only one of [fulfillment, buyer_email]
+      // fields should be set"), and the buyer's details are already carried on
+      // pickup_details.recipient. The buyer types their email on Square's page,
+      // which is what triggers the receipt anyway.
     }),
   });
 
