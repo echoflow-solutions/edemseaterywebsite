@@ -55,17 +55,44 @@ export const OPENING_HOURS: OpeningHour[] = [
 export type OrderOption = {
   label: string;
   description: string;
-  href: string;
+  /** Omitted when the option only opens a nested list of choices. */
+  href?: string;
+  /** Opens in a new tab, so the restaurant site stays put behind it. */
+  external?: boolean;
+  /** Nested choices, used by delivery to offer each platform. */
+  options?: OrderOption[];
 };
 
 /**
- * Targets for the Takeaway menu in the navigation bar. Only links we can
- * verify live here — third-party delivery platforms can be appended once
- * their store URLs are confirmed.
+ * Third-party delivery storefronts.
+ *
+ * The `srsltid` query parameter was stripped from both URLs — it is a Google
+ * search click-tracking token tied to a single search session, not part of the
+ * store address.
  */
+export const DELIVERY_PLATFORMS: OrderOption[] = [
+  {
+    label: 'Uber Eats',
+    description: 'Order on Uber Eats',
+    href: 'https://www.ubereats.com/au/store/edems-eatery-liverpool/rMRmyzCbU8mfhVQv00iCHQ',
+    external: true,
+  },
+  {
+    label: 'DoorDash',
+    description: 'Order on DoorDash',
+    href: 'https://www.doordash.com/en-AU/store/edems-eatery-liverpool-42514042/106374353/',
+    external: true,
+  },
+];
+
+/** Targets for the Takeaway menu in the navigation bar. */
 export const ORDER_OPTIONS: OrderOption[] = [
   { label: 'Order for Pickup', description: 'Ready when you are', href: ORDER_URL },
-  { label: 'Order for Delivery', description: 'Brought to your door', href: ORDER_URL },
+  {
+    label: 'Order for Delivery',
+    description: 'Uber Eats or DoorDash',
+    options: DELIVERY_PLATFORMS,
+  },
   { label: 'Call to Order', description: RESTAURANT.phoneDisplay, href: RESTAURANT.phoneHref },
 ];
 

@@ -2,8 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { MapPin, Clock, Phone, Mail, Car, Train, ParkingSquare, ArrowRight } from 'lucide-react';
-import { RESTAURANT, ORDER_URL, OPENING_HOURS, MAP_EMBED_URL } from '@/lib/site';
+import { MapPin, Clock, Phone, Mail, Car, Train, ParkingSquare, ArrowRight, ExternalLink } from 'lucide-react';
+import { RESTAURANT, ORDER_URL, OPENING_HOURS, MAP_EMBED_URL, DELIVERY_PLATFORMS } from '@/lib/site';
 
 const Location = () => {
   const [ref, inView] = useInView({
@@ -187,23 +187,38 @@ const Location = () => {
             </div>
 
             {/* Order Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => window.location.href = ORDER_URL}
-                className="px-6 py-4 bg-secondary text-primary rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300 shadow-lg"
+                className="w-full px-6 py-4 bg-secondary text-primary rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300 shadow-lg"
               >
                 ORDER FOR PICKUP
               </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => window.location.href = ORDER_URL}
-                className="px-6 py-4 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-all duration-300 shadow-lg"
-              >
-                ORDER FOR DELIVERY
-              </motion.button>
+
+              {/* Delivery runs through the platforms, not our own ordering page */}
+              <div>
+                <p className="text-center text-sm text-gray-500 mb-3">
+                  Or get it delivered
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {DELIVERY_PLATFORMS.map((platform) => (
+                    <motion.a
+                      key={platform.label}
+                      href={platform.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-all duration-300 shadow-lg"
+                    >
+                      {platform.label}
+                      <ExternalLink className="w-4 h-4" />
+                    </motion.a>
+                  ))}
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>

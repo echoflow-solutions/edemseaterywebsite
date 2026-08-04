@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, ExternalLink } from 'lucide-react';
 import { ORDER_OPTIONS } from '@/lib/site';
 
 const navItems = [
@@ -19,7 +19,13 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [takeawayOpen, setTakeawayOpen] = useState(false);
+  const [expandedOption, setExpandedOption] = useState<string | null>(null);
   const takeawayRef = useRef<HTMLDivElement>(null);
+
+  const closeTakeaway = () => {
+    setTakeawayOpen(false);
+    setExpandedOption(null);
+  };
 
   useEffect(() => {
     // Scroll to top on page load
@@ -41,11 +47,11 @@ const Navigation = () => {
 
     const handlePointerDown = (event: MouseEvent) => {
       if (takeawayRef.current && !takeawayRef.current.contains(event.target as Node)) {
-        setTakeawayOpen(false);
+        closeTakeaway();
       }
     };
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setTakeawayOpen(false);
+      if (event.key === 'Escape') closeTakeaway();
     };
 
     document.addEventListener('mousedown', handlePointerDown);
@@ -116,7 +122,7 @@ const Navigation = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setTakeawayOpen((open) => !open)}
+                  onClick={() => (takeawayOpen ? closeTakeaway() : setTakeawayOpen(true))}
                   aria-haspopup="menu"
                   aria-expanded={takeawayOpen}
                   className="flex items-center gap-2 bg-secondary text-primary px-6 py-3 rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300"
@@ -137,20 +143,94 @@ const Navigation = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl overflow-hidden border border-secondary/20"
+                      className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-2xl overflow-hidden border border-secondary/20"
                     >
-                      {ORDER_OPTIONS.map((option) => (
-                        <a
-                          key={option.label}
-                          role="menuitem"
-                          href={option.href}
-                          onClick={() => setTakeawayOpen(false)}
-                          className="block px-5 py-4 hover:bg-secondary/10 transition-colors duration-200 border-b border-gray-100 last:border-0"
-                        >
-                          <span className="block font-bold text-primary">{option.label}</span>
-                          <span className="block text-sm text-gray-500">{option.description}</span>
-                        </a>
-                      ))}
+                      {ORDER_OPTIONS.map((option) => {
+                        const isExpanded = expandedOption === option.label;
+
+                        // Options with nested choices expand in place rather
+                        // than navigating anywhere themselves.
+                        if (option.options) {
+                          return (
+                            <div
+                              key={option.label}
+                              className="border-b border-gray-100 last:border-0"
+                            >
+                              <button
+                                type="button"
+                                aria-expanded={isExpanded}
+                                onClick={() =>
+                                  setExpandedOption(isExpanded ? null : option.label)
+                                }
+                                className="w-full flex items-center justify-between gap-2 px-5 py-4 text-left hover:bg-secondary/10 transition-colors duration-200"
+                              >
+                                <span>
+                                  <span className="block font-bold text-primary">
+                                    {option.label}
+                                  </span>
+                                  <span className="block text-sm text-gray-500">
+                                    {option.description}
+                                  </span>
+                                </span>
+                                <ChevronDown
+                                  className={`w-4 h-4 text-primary flex-shrink-0 transition-transform duration-300 ${
+                                    isExpanded ? 'rotate-180' : ''
+                                  }`}
+                                />
+                              </button>
+
+                              <AnimatePresence initial={false}>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden bg-cream"
+                                  >
+                                    {option.options.map((platform) => (
+                                      <a
+                                        key={platform.label}
+                                        role="menuitem"
+                                        href={platform.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={closeTakeaway}
+                                        className="flex items-center justify-between gap-2 pl-8 pr-5 py-3 hover:bg-secondary/20 transition-colors duration-200 border-t border-white"
+                                      >
+                                        <span>
+                                          <span className="block font-bold text-primary">
+                                            {platform.label}
+                                          </span>
+                                          <span className="block text-sm text-gray-500">
+                                            {platform.description}
+                                          </span>
+                                        </span>
+                                        <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                      </a>
+                                    ))}
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <a
+                            key={option.label}
+                            role="menuitem"
+                            href={option.href}
+                            onClick={closeTakeaway}
+                            className="block px-5 py-4 hover:bg-secondary/10 transition-colors duration-200 border-b border-gray-100 last:border-0"
+                          >
+                            <span className="block font-bold text-primary">{option.label}</span>
+                            <span className="block text-sm text-gray-500">
+                              {option.description}
+                            </span>
+                          </a>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -198,17 +278,38 @@ const Navigation = () => {
             <p className="px-3 text-secondary text-sm font-bold tracking-wider uppercase">
               Takeaway
             </p>
-            {ORDER_OPTIONS.map((option) => (
-              <a
-                key={option.label}
-                href={option.href}
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-between px-3 py-2 text-white hover:text-secondary transition-colors duration-300"
-              >
-                <span className="font-medium">{option.label}</span>
-                <span className="text-white/50 text-sm">{option.description}</span>
-              </a>
-            ))}
+            {ORDER_OPTIONS.map((option) =>
+              option.options ? (
+                // Nested choices are flattened on mobile — an accordion inside
+                // an accordion is more taps than it is worth.
+                <div key={option.label}>
+                  <p className="px-3 pt-2 pb-1 text-white/60 text-sm">{option.label}</p>
+                  {option.options.map((platform) => (
+                    <a
+                      key={platform.label}
+                      href={platform.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-between pl-6 pr-3 py-2 text-white hover:text-secondary transition-colors duration-300"
+                    >
+                      <span className="font-medium">{platform.label}</span>
+                      <ExternalLink className="w-4 h-4 text-white/40" />
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <a
+                  key={option.label}
+                  href={option.href}
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 text-white hover:text-secondary transition-colors duration-300"
+                >
+                  <span className="font-medium">{option.label}</span>
+                  <span className="text-white/50 text-sm">{option.description}</span>
+                </a>
+              )
+            )}
           </div>
         </div>
       </motion.div>
