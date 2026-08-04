@@ -19,6 +19,11 @@ export const PICKUP_SETTINGS = {
   slotIntervalMinutes: 15,
   /** Stop accepting orders this many minutes before closing. */
   lastOrderBufferMinutes: 30,
+  /**
+   * How many future trading days can be pre-ordered, beyond today. Closed
+   * days are skipped, so on a Sunday this offers Tuesday rather than Monday.
+   */
+  preOrderDays: 1,
 } as const;
 
 type Weekday = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat';
@@ -97,6 +102,41 @@ const instantForSydneyMinutes = (clock: SydneyClock, minutes: number): Date =>
       clock.offsetMs
   );
 
+type DayContext = {
+  year: number;
+  month: number;
+  day: number;
+  weekday: Weekday;
+  offsetMs: number;
+};
+
+/**
+ * The Sydney calendar day a given number of days after the supplied clock,
+ * together with the UTC offset in force on that day. The offset is sampled at
+ * roughly midday Sydney so a DST change overnight cannot skew it.
+ */
+const getDayContext = (base: SydneyClock, offsetDays: number): DayContext => {
+  const target = new Date(Date.UTC(base.year, base.month - 1, base.day + offsetDays));
+  const year = target.getUTCFullYear();
+  const month = target.getUTCMonth() + 1;
+  const day = target.getUTCDate();
+  const weekday = ORDERED_WEEKDAYS[target.getUTCDay()];
+  // 02:00 UTC lands at midday-ish in Sydney on the same calendar date.
+  const { offsetMs } = getSydneyClock(new Date(Date.UTC(year, month - 1, day, 2, 0)));
+  return { year, month, day, weekday, offsetMs };
+};
+
+const instantForDayMinutes = (context: DayContext, minutes: number): Date =>
+  new Date(
+    Date.UTC(
+      context.year,
+      context.month - 1,
+      context.day,
+      Math.floor(minutes / 60),
+      minutes % 60
+    ) - context.offsetMs
+  );
+
 const formatMinutes = (minutes: number): string => {
   const hour24 = Math.floor(minutes / 60);
   const minute = minutes % 60;
@@ -112,32 +152,17 @@ export const isOpenAt = (instant: Date): boolean => {
   return clock.minutes >= window.open && clock.minutes < window.close;
 };
 
-/** The next day the kitchen opens, e.g. "Tuesday from 11:00am". */
-export const getNextOpening = (instant: Date): string => {
-  const clock = getSydneyClock(instant);
-  const todayIndex = ORDERED_WEEKDAYS.indexOf(clock.weekday);
-
-  for (let ahead = 0; ahead < 8; ahead += 1) {
-    const weekday = ORDERED_WEEKDAYS[(todayIndex + ahead) % 7];
-    const window = TRADING_WINDOWS[weekday];
-    if (!window) continue;
-    // Today only counts if there is still time left to order.
-    if (ahead === 0 && clock.minutes >= window.close - PICKUP_SETTINGS.lastOrderBufferMinutes) {
-      continue;
-    }
-    const when = ahead === 0 ? 'today' : ahead === 1 ? 'tomorrow' : WEEKDAY_NAMES[weekday];
-    const opensAt = ahead === 0 ? formatMinutes(clock.minutes) : formatMinutes(window.open);
-    return ahead === 0 ? `today until ${formatMinutes(window.close)}` : `${when} from ${opensAt}`;
-  }
-
-  return 'soon';
-};
-
 export type PickupSlot = {
   /** ISO instant, ready to send to Square as pickup_at. */
   value: string;
   /** Sydney-local label for the customer, e.g. "6:15pm". */
   label: string;
+};
+
+export type PickupDay = {
+  /** "Today", "Tomorrow", or the weekday name. */
+  label: string;
+  slots: PickupSlot[];
 };
 
 export type PickupAvailability = {
@@ -147,68 +172,97 @@ export type PickupAvailability = {
   asapLabel: string | null;
   /** ISO instant for the ASAP estimate. */
   asapValue: string | null;
-  /** Later slots available today. Empty outside trading hours. */
-  slots: PickupSlot[];
-  /** Set when ordering is unavailable, explaining why. */
-  closedReason: string | null;
+  /** Selectable days, today first, closed days skipped. */
+  days: PickupDay[];
+  /** Informational note about today's trading, if any. */
+  notice: string | null;
 };
 
+/** Look no further ahead than this when hunting for the next trading day. */
+const LOOKAHEAD_LIMIT_DAYS = 8;
+
 /**
- * Work out what pickup times can be offered for an instant. Slots run from the
- * earliest the kitchen could have food ready up to the last-order cutoff, and
- * never cross midnight because the venue always closes the same day.
+ * Work out what pickup times can be offered from a given instant: the rest of
+ * today, plus the next trading days allowed for pre-orders. Slots never cross
+ * midnight because the venue always closes the same day it opens.
  */
 export const getPickupAvailability = (instant: Date): PickupAvailability => {
   const clock = getSydneyClock(instant);
-  const window = TRADING_WINDOWS[clock.weekday];
-
-  const unavailable = (reason: string): PickupAvailability => ({
-    asapAvailable: false,
-    asapLabel: null,
-    asapValue: null,
-    slots: [],
-    closedReason: reason,
-  });
-
-  if (!window) {
-    return unavailable(
-      `We are closed on ${WEEKDAY_NAMES[clock.weekday]}. We reopen ${getNextOpening(instant)}.`
-    );
-  }
-
-  const lastOrder = window.close - PICKUP_SETTINGS.lastOrderBufferMinutes;
-
-  if (clock.minutes >= lastOrder) {
-    return unavailable(`Online orders for today have closed. We reopen ${getNextOpening(instant)}.`);
-  }
-
-  // Before opening, the first order can only be ready once the kitchen is on.
-  const readyFrom = Math.max(clock.minutes + PICKUP_SETTINGS.prepMinutes, window.open);
-
-  if (readyFrom > window.close) {
-    return unavailable(`Online orders for today have closed. We reopen ${getNextOpening(instant)}.`);
-  }
-
   const interval = PICKUP_SETTINGS.slotIntervalMinutes;
-  const firstSlot = Math.ceil(readyFrom / interval) * interval;
+  const todayWindow = TRADING_WINDOWS[clock.weekday];
 
-  const slots: PickupSlot[] = [];
-  for (let minutes = firstSlot; minutes <= window.close; minutes += interval) {
-    slots.push({
-      value: instantForSydneyMinutes(clock, minutes).toISOString(),
-      label: formatMinutes(minutes),
-    });
+  const days: PickupDay[] = [];
+  let futureDaysAdded = 0;
+
+  for (let offset = 0; offset <= LOOKAHEAD_LIMIT_DAYS; offset += 1) {
+    const context = getDayContext(clock, offset);
+    const window = TRADING_WINDOWS[context.weekday];
+    if (!window) continue;
+
+    let earliest: number;
+    if (offset === 0) {
+      // Today only counts while there is still time to cook before cutoff.
+      const lastOrder = window.close - PICKUP_SETTINGS.lastOrderBufferMinutes;
+      if (clock.minutes >= lastOrder) continue;
+      earliest = Math.max(clock.minutes + PICKUP_SETTINGS.prepMinutes, window.open);
+    } else {
+      earliest = window.open;
+    }
+
+    const firstSlot = Math.ceil(earliest / interval) * interval;
+    const slots: PickupSlot[] = [];
+    for (let minutes = firstSlot; minutes <= window.close; minutes += interval) {
+      slots.push({
+        value: instantForDayMinutes(context, minutes).toISOString(),
+        label: formatMinutes(minutes),
+      });
+    }
+    if (slots.length === 0) continue;
+
+    const label =
+      offset === 0 ? 'Today' : offset === 1 ? 'Tomorrow' : WEEKDAY_NAMES[context.weekday];
+    days.push({ label, slots });
+
+    if (offset > 0) {
+      futureDaysAdded += 1;
+      if (futureDaysAdded >= PICKUP_SETTINGS.preOrderDays) break;
+    }
   }
 
-  const openNow = clock.minutes >= window.open;
+  const openNow =
+    todayWindow !== null &&
+    clock.minutes >= todayWindow.open &&
+    clock.minutes < todayWindow.close - PICKUP_SETTINGS.lastOrderBufferMinutes;
+
+  const readyFrom = openNow ? clock.minutes + PICKUP_SETTINGS.prepMinutes : null;
+  const asapAvailable =
+    todayWindow !== null && readyFrom !== null && readyFrom <= todayWindow.close;
+
+  const nextDay = days.find((day) => day.label !== 'Today');
+  // "tomorrow" reads better lowercase mid-sentence; a weekday is a proper noun.
+  const nextDayPhrase = nextDay
+    ? ` You can pre-order for ${
+        nextDay.label === 'Tomorrow' ? 'tomorrow' : nextDay.label
+      } below.`
+    : '';
+
+  let notice: string | null = null;
+  if (!todayWindow) {
+    notice = `We are closed on ${WEEKDAY_NAMES[clock.weekday]}.${nextDayPhrase}`;
+  } else if (clock.minutes < todayWindow.open) {
+    notice = `We open at ${formatMinutes(todayWindow.open)} today. Choose a pickup time below.`;
+  } else if (!openNow) {
+    notice = `Online orders for today have closed.${nextDayPhrase}`;
+  }
 
   return {
-    asapAvailable: openNow,
-    asapLabel: openNow ? `Ready around ${formatMinutes(readyFrom)}` : null,
-    asapValue: openNow ? instantForSydneyMinutes(clock, readyFrom).toISOString() : null,
-    slots,
-    closedReason: openNow
-      ? null
-      : `We open at ${formatMinutes(window.open)} today. You can still schedule a pickup time below.`,
+    asapAvailable,
+    asapLabel: asapAvailable && readyFrom !== null ? `Ready around ${formatMinutes(readyFrom)}` : null,
+    asapValue:
+      asapAvailable && readyFrom !== null
+        ? instantForSydneyMinutes(clock, readyFrom).toISOString()
+        : null,
+    days,
+    notice,
   };
 };

@@ -48,14 +48,25 @@ const CartDrawer = () => {
 
   const availability = useMemo(() => (now ? getPickupAvailability(now) : null), [now]);
 
+  /** Every selectable slot, flattened, with its day prefixed onto the label. */
+  const allSlots = useMemo(
+    () =>
+      availability
+        ? availability.days.flatMap((day) =>
+            day.slots.map((slot) => ({ ...slot, label: `${day.label}, ${slot.label}` }))
+          )
+        : [],
+    [availability]
+  );
+
   // If ASAP stops being offered (kitchen closed for the day), fall back to a slot.
   useEffect(() => {
     if (!availability) return;
-    if (pickupWhen.type === 'asap' && !availability.asapAvailable && availability.slots.length > 0) {
-      const first = availability.slots[0];
+    if (pickupWhen.type === 'asap' && !availability.asapAvailable && allSlots.length > 0) {
+      const first = allSlots[0];
       setPickupWhen({ type: 'scheduled', value: first.value, label: first.label });
     }
-  }, [availability, pickupWhen, setPickupWhen]);
+  }, [availability, allSlots, pickupWhen, setPickupWhen]);
 
   const cartRows = lines
     .map((line) => ({ line, item: findMenuItem(line.id) }))
@@ -63,8 +74,7 @@ const CartDrawer = () => {
       row.item !== undefined
     );
 
-  const orderingBlocked = availability !== null && availability.slots.length === 0;
-  const canCheckout = itemCount > 0 && !orderingBlocked;
+  const orderingBlocked = availability !== null && allSlots.length === 0;
 
   return (
     <AnimatePresence>
@@ -175,10 +185,10 @@ const CartDrawer = () => {
                     Pickup time
                   </h3>
 
-                  {availability.closedReason && (
+                  {availability.notice && (
                     <p className="flex items-start gap-2 text-sm text-gray-600 bg-secondary/10 rounded-lg p-3 mb-3">
                       <AlertCircle className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                      {availability.closedReason}
+                      {availability.notice}
                     </p>
                   )}
 
@@ -198,14 +208,14 @@ const CartDrawer = () => {
                     </label>
                   )}
 
-                  {availability.slots.length > 0 && (
+                  {allSlots.length > 0 && (
                     <label className="flex items-start gap-3 p-3 rounded-lg border border-primary/10 cursor-pointer hover:bg-secondary/5 transition-colors">
                       <input
                         type="radio"
                         name="pickup-when"
                         checked={pickupWhen.type === 'scheduled'}
                         onChange={() => {
-                          const first = availability.slots[0];
+                          const first = allSlots[0];
                           setPickupWhen({
                             type: 'scheduled',
                             value: first.value,
@@ -216,12 +226,12 @@ const CartDrawer = () => {
                       />
                       <span className="flex-1">
                         <span className="block font-semibold text-primary mb-2">
-                          Schedule for later today
+                          {availability.asapAvailable ? 'Schedule for later' : 'Choose a pickup time'}
                         </span>
                         <select
                           value={pickupWhen.type === 'scheduled' ? pickupWhen.value : ''}
                           onChange={(event) => {
-                            const slot = availability.slots.find(
+                            const slot = allSlots.find(
                               (candidate) => candidate.value === event.target.value
                             );
                             if (slot) {
@@ -239,10 +249,19 @@ const CartDrawer = () => {
                           <option value="" disabled>
                             Choose a time
                           </option>
-                          {availability.slots.map((slot) => (
-                            <option key={slot.value} value={slot.value}>
-                              {slot.label}
-                            </option>
+                          {/*
+                            The day is repeated in each option because a
+                            collapsed select shows the option text only, never
+                            its optgroup — "11:00am" alone reads as today.
+                          */}
+                          {availability.days.map((day) => (
+                            <optgroup key={day.label} label={day.label}>
+                              {day.slots.map((slot) => (
+                                <option key={slot.value} value={slot.value}>
+                                  {day.label} {slot.label}
+                                </option>
+                              ))}
+                            </optgroup>
                           ))}
                         </select>
                       </span>
@@ -309,7 +328,7 @@ const CartDrawer = () => {
                 </button>
               )}
 
-              {!canCheckout && itemCount > 0 && orderingBlocked && (
+              {itemCount > 0 && orderingBlocked && (
                 <p className="text-xs text-center text-gray-500">
                   Ordering is closed right now — your items are saved for later.
                 </p>
