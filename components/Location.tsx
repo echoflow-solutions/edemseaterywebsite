@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { MapPin, Clock, Phone, Mail, Car, Train, ParkingSquare } from 'lucide-react';
+import { MapPin, Clock, Phone, Mail, Car, Train, ParkingSquare, ArrowRight } from 'lucide-react';
+import { RESTAURANT, ORDER_URL, OPENING_HOURS, MAP_EMBED_URL } from '@/lib/site';
 
 const Location = () => {
   const [ref, inView] = useInView({
@@ -10,11 +11,7 @@ const Location = () => {
     threshold: 0.1,
   });
 
-  const hours = [
-    { day: 'Tuesday - Saturday', time: '11:00 AM - 8:00 PM' },
-    { day: 'Sunday', time: '1:00 PM - 8:00 PM' },
-    { day: 'Monday', time: 'CLOSED', closed: true },
-  ];
+  const hours = OPENING_HOURS;
 
   const transport = [
     { icon: Car, text: '45 minutes drive from Sydney CBD' },
@@ -52,14 +49,14 @@ const Location = () => {
             className="relative rounded-2xl overflow-hidden shadow-2xl h-[400px] lg:h-[500px] group"
           >
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3311.9999999999995!2d150.9229999999999!3d-33.939999999999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b12bad3c8c8c8c9%3A0x0!2s4%2F158%20Macquarie%20Street%2C%20Liverpool%20NSW%202170!5e0!3m2!1sen!2sau!4v1635000000000!5m2!1sen!2sau"
+              src={MAP_EMBED_URL}
+              title={`Map showing ${RESTAURANT.name} at ${RESTAURANT.addressShort}`}
               width="100%"
               height="100%"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="filter grayscale group-hover:grayscale-0 transition-all duration-500"
             ></iframe>
             
             {/* Map overlay with address */}
@@ -68,9 +65,9 @@ const Location = () => {
                 <div className="flex items-start gap-3">
                   <MapPin className="w-6 h-6 text-secondary mt-1" />
                   <div>
-                    <p className="font-semibold text-primary">Edem&apos;s Eatery</p>
-                    <p className="text-gray-600">4/158 Macquarie Street</p>
-                    <p className="text-gray-600">Liverpool NSW 2170</p>
+                    <p className="font-semibold text-primary">{RESTAURANT.name}</p>
+                    <p className="text-gray-600">{RESTAURANT.street}</p>
+                    <p className="text-gray-600">{RESTAURANT.suburb}</p>
                     <p className="text-gray-600">Sydney, Australia</p>
                   </div>
                 </div>
@@ -91,7 +88,10 @@ const Location = () => {
                 <div className="w-12 h-12 bg-secondary/20 rounded-full flex items-center justify-center">
                   <Clock className="w-6 h-6 text-secondary" />
                 </div>
-                <h3 className="text-xl font-bold text-primary">Operating Hours</h3>
+                <div>
+                  <p className="font-script text-xl text-secondary leading-none">We are open</p>
+                  <h3 className="text-xl font-bold text-primary">Operating Hours</h3>
+                </div>
               </div>
               <div className="space-y-3">
                 {hours.map((item, index) => (
@@ -113,28 +113,31 @@ const Location = () => {
 
             {/* Contact */}
             <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-lg border border-gray-100">
+              <p className="font-script text-xl text-secondary leading-none">
+                Need help? Call us on
+              </p>
               <h3 className="text-xl font-bold text-primary mb-4">Contact Information</h3>
               <div className="space-y-4">
                 <motion.a
-                  href="tel:0272388800"
+                  href={RESTAURANT.phoneHref}
                   className="flex items-center gap-3 text-gray-700 hover:text-secondary transition-colors"
                   whileHover={{ x: 5 }}
                 >
                   <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
                     <Phone className="w-5 h-5 text-secondary" />
                   </div>
-                  <span className="font-medium">(02) 7238 8800</span>
+                  <span className="font-medium">{RESTAURANT.phoneDisplay}</span>
                 </motion.a>
-                
+
                 <motion.a
-                  href="mailto:info@edemseatery.com"
+                  href={`mailto:${RESTAURANT.email}`}
                   className="flex items-center gap-3 text-gray-700 hover:text-secondary transition-colors"
                   whileHover={{ x: 5 }}
                 >
                   <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
                     <Mail className="w-5 h-5 text-secondary" />
                   </div>
-                  <span className="font-medium">info@edemseatery.com</span>
+                  <span className="font-medium">{RESTAURANT.email}</span>
                 </motion.a>
 
                 <motion.a
@@ -152,6 +155,16 @@ const Location = () => {
                   <span className="font-medium">@edemseatery</span>
                 </motion.a>
               </div>
+
+              <motion.a
+                href={`mailto:${RESTAURANT.email}`}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-all duration-300 shadow-lg"
+              >
+                Drop us a mail
+                <ArrowRight className="w-4 h-4" />
+              </motion.a>
             </div>
 
             {/* Getting Here */}
@@ -178,7 +191,7 @@ const Location = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web'}
+                onClick={() => window.location.href = ORDER_URL}
                 className="px-6 py-4 bg-secondary text-primary rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300 shadow-lg"
               >
                 ORDER FOR PICKUP
@@ -186,7 +199,7 @@ const Location = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web'}
+                onClick={() => window.location.href = ORDER_URL}
                 className="px-6 py-4 bg-primary text-white rounded-full font-bold hover:bg-primary/90 transition-all duration-300 shadow-lg"
               >
                 ORDER FOR DELIVERY

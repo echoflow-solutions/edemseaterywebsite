@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Phone } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
+import { RESTAURANT, ORDER_URL } from '@/lib/site';
 
 const Hero = () => {
   const [mounted, setMounted] = useState(false);
@@ -42,6 +43,22 @@ const Hero = () => {
         {/* Animated gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-transparent to-transparent z-20"></div>
       </div>
+
+      {/* Thin gold bracket frame */}
+      <div className="absolute inset-4 md:inset-8 z-20 pointer-events-none hidden sm:block">
+        <span className="absolute top-0 left-0 w-12 h-12 border-t border-l border-secondary/50"></span>
+        <span className="absolute top-0 right-0 w-12 h-12 border-t border-r border-secondary/50"></span>
+        <span className="absolute bottom-0 left-0 w-12 h-12 border-b border-l border-secondary/50"></span>
+        <span className="absolute bottom-0 right-0 w-12 h-12 border-b border-r border-secondary/50"></span>
+      </div>
+
+      {/* Rotated edge labels */}
+      <span className="hidden xl:block absolute left-8 top-1/2 -translate-y-1/2 z-30 text-secondary/70 text-xs tracking-[0.35em] uppercase [writing-mode:vertical-rl] rotate-180 pointer-events-none">
+        Tradition meets table
+      </span>
+      <span className="hidden xl:block absolute right-8 top-1/2 -translate-y-1/2 z-30 text-secondary/70 text-xs tracking-[0.35em] uppercase [writing-mode:vertical-rl] pointer-events-none">
+        {RESTAURANT.region}
+      </span>
 
       {/* Floating particles effect - only render after mount */}
       {mounted && (
@@ -90,7 +107,30 @@ const Hero = () => {
           transition={{ duration: 0.8 }}
           className="pt-8 md:pt-0"
         >
-          <motion.h1 
+          {/* Eyebrow with flanking rules */}
+          <motion.div
+            className="flex items-center justify-center gap-4 mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="h-px w-10 sm:w-20 bg-secondary/60"></span>
+            <span className="text-secondary/90 text-[0.65rem] sm:text-xs tracking-[0.3em] uppercase whitespace-nowrap">
+              Authentic &middot; Handcrafted &middot; Ghanaian
+            </span>
+            <span className="h-px w-10 sm:w-20 bg-secondary/60"></span>
+          </motion.div>
+
+          <motion.p
+            className="font-script text-3xl md:text-4xl text-secondary mb-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+          >
+            a taste of ghana
+          </motion.p>
+
+          <motion.h1
             className="text-5xl md:text-7xl lg:text-8xl font-bold font-heading text-white mb-6"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -141,7 +181,7 @@ const Hero = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web'}
+              onClick={() => window.location.href = ORDER_URL}
               className="relative px-8 py-4 bg-secondary text-primary rounded-full font-bold text-lg btn-shimmer glow overflow-hidden group cursor-pointer"
             >
               <span className="relative z-10">ORDER NOW - Delivery &amp; Pickup</span>
@@ -176,9 +216,9 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 1.2 }}
         >
           {[
-            { icon: MapPin, text: '4/158 Macquarie St, Liverpool' },
+            { icon: MapPin, text: RESTAURANT.addressShort },
             { icon: Clock, text: 'Tue-Sat: 11AM-8PM, Sun: 1PM-8PM' },
-            { icon: Phone, text: '(02) 7238 8800' },
+            { icon: Phone, text: RESTAURANT.phoneDisplay },
           ].map((item, index) => (
             <motion.div
               key={index}

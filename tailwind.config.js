@@ -11,12 +11,17 @@ module.exports = {
         primary: "#3E2723",
         secondary: "#FFC107",
         accent: "#4CAF50",
+        // Muted green for large panels — the brighter accent green overwhelms
+        // at panel scale next to the brown/gold palette.
+        olive: "#4F5D2F",
+        cream: "#FBF6EC",
         dark: "#333333",
         light: "#F5F5F5",
       },
       fontFamily: {
         heading: ["Montserrat", "sans-serif"],
         body: ["Open Sans", "sans-serif"],
+        script: ["Caveat", "cursive"],
       },
       animation: {
         shimmer: "shimmer 2s linear infinite",

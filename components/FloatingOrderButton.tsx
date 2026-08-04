@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag } from 'lucide-react';
+import { ORDER_URL } from '@/lib/site';
 
 const FloatingOrderButton = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,7 +26,7 @@ const FloatingOrderButton = () => {
           exit={{ opacity: 0, scale: 0 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => window.location.href = 'https://orders.wowapps.com/order/edemseatery?src=web'}
+          onClick={() => window.location.href = ORDER_URL}
           className="fixed bottom-8 right-8 z-40 bg-secondary text-primary rounded-full shadow-2xl glow group overflow-hidden cursor-pointer"
         >
           <div className="relative px-6 py-4">

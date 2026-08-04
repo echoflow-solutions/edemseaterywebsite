@@ -1,15 +1,21 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Heart } from 'lucide-react';
+import { Heart, MapPin, Phone, Mail } from 'lucide-react';
+import Link from 'next/link';
+import { RESTAURANT, LEGAL_LINKS, CATERING_SERVICES } from '@/lib/site';
 
 const Footer = () => {
   const quickLinks = [
     { label: 'Menu', href: '#menu' },
     { label: 'About Us', href: '#about' },
-    { label: 'Catering Services', href: '#contact' },
+    { label: 'Catering Services', href: '#catering' },
+    { label: 'Gallery', href: '#gallery' },
+    { label: 'Reviews', href: '#reviews' },
     { label: 'Contact', href: '#contact' },
   ];
+
+  const infoBadges = ['100% Halal Certified', 'Catering Available', 'Group Bookings Welcome'];
 
   const socialLinks = [
     {
@@ -61,7 +67,7 @@ const Footer = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Quick Links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -69,7 +75,7 @@ const Footer = () => {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-secondary font-bold text-lg mb-4">Quick Links</h3>
+            <h3 className="font-script text-secondary text-3xl mb-4">Quick Links</h3>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.label}>
@@ -89,54 +95,104 @@ const Footer = () => {
             </ul>
           </motion.div>
 
-          {/* Connect */}
+          {/* Our Services */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-secondary font-bold text-lg mb-4">Connect</h3>
-            <div className="space-y-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-white/80 hover:text-secondary transition-colors duration-300 group"
-                >
-                  <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center group-hover:bg-secondary/20 transition-colors duration-300">
-                    {social.icon}
-                  </div>
-                  <span>{social.name}</span>
-                </a>
+            <h3 className="font-script text-secondary text-3xl mb-4">Our Services</h3>
+            <ul className="space-y-2">
+              {CATERING_SERVICES.map((service) => (
+                <li key={service.title}>
+                  <a
+                    href="#catering"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick('#catering');
+                    }}
+                    className="text-white/80 hover:text-secondary transition-colors duration-300 flex items-center gap-2 group"
+                  >
+                    <span className="w-0 h-0.5 bg-secondary group-hover:w-4 transition-all duration-300"></span>
+                    {service.title}
+                  </a>
+                </li>
               ))}
-            </div>
+            </ul>
           </motion.div>
 
-          {/* Info */}
+          {/* Legal */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-secondary font-bold text-lg mb-4">Info</h3>
-            <ul className="space-y-2 text-white/80">
-              <li className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-secondary rounded-full"></span>
-                100% Halal Certified
+            <h3 className="font-script text-secondary text-3xl mb-4">Explore</h3>
+            <ul className="space-y-2">
+              {LEGAL_LINKS.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className="text-white/80 hover:text-secondary transition-colors duration-300 flex items-center gap-2 group"
+                  >
+                    <span className="w-0 h-0.5 bg-secondary group-hover:w-4 transition-all duration-300"></span>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Get in Touch */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="font-script text-secondary text-3xl mb-4">Get in Touch</h3>
+            <ul className="space-y-3 text-white/80">
+              <li className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                <span>{RESTAURANT.addressShort}</span>
               </li>
-              <li className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-secondary rounded-full"></span>
-                Catering Available
+              <li>
+                <a
+                  href={RESTAURANT.phoneHref}
+                  className="flex items-center gap-3 hover:text-secondary transition-colors duration-300"
+                >
+                  <Phone className="w-5 h-5 text-secondary flex-shrink-0" />
+                  {RESTAURANT.phoneDisplay}
+                </a>
               </li>
-              <li className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-secondary rounded-full"></span>
-                Group Bookings Welcome
+              <li>
+                <a
+                  href={`mailto:${RESTAURANT.email}`}
+                  className="flex items-center gap-3 hover:text-secondary transition-colors duration-300 break-all"
+                >
+                  <Mail className="w-5 h-5 text-secondary flex-shrink-0" />
+                  {RESTAURANT.email}
+                </a>
               </li>
             </ul>
+
+            <div className="flex items-center gap-3 mt-5">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.name}
+                  title={social.name}
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/80 hover:bg-secondary/20 hover:text-secondary transition-colors duration-300"
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
           </motion.div>
         </div>
 
@@ -148,9 +204,18 @@ const Footer = () => {
           viewport={{ once: true }}
           className="pt-8 border-t border-white/20"
         >
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-6">
+            {infoBadges.map((badge) => (
+              <span key={badge} className="flex items-center gap-2 text-white/70 text-sm">
+                <span className="w-2 h-2 bg-secondary rounded-full"></span>
+                {badge}
+              </span>
+            ))}
+          </div>
+
           <div className="text-center">
             <p className="text-white/60 flex items-center justify-center gap-2 mb-4">
-              © {new Date().getFullYear()} Edem&apos;s Eatery - Authentic Ghanaian Cuisine | Liverpool NSW
+              © {new Date().getFullYear()} {RESTAURANT.name} - {RESTAURANT.tagline} | Liverpool NSW
               <span className="text-secondary">
                 <Heart className="w-4 h-4 fill-current" />
               </span>
