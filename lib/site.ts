@@ -22,6 +22,9 @@ export const RESTAURANT = {
   openingSummary: 'Open Tue – Sun',
 } as const;
 
+/** Public origin of the site. Used to build absolute metadata URLs. */
+export const SITE_URL = 'https://edemseatery.com.au';
+
 export const ORDER_URL = 'https://orders.wowapps.com/order/edemseatery?src=web';
 
 /**

@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  // Lets Next resolve relative metadata URLs against the real origin.
+  metadataBase: new URL(SITE_URL),
   title: "Edem's Eatery - Authentic Ghanaian Cuisine in Liverpool",
   description: "Experience authentic Ghanaian cuisine at Edem's Eatery in Liverpool, NSW. Enjoy traditional dishes like Jollof Rice, Waakye, Banku, and more. 100% Halal certified. Dine-in, takeaway, and catering available.",
   keywords: "Ghanaian restaurant, African food Liverpool, Halal restaurant Sydney, Jollof rice, Waakye, Banku, Fufu, African cuisine NSW",
@@ -19,11 +22,11 @@ export const metadata: Metadata = {
     description: "Where Every Bite Tells a Story of Heritage, Flavor & Passion",
     type: "website",
     locale: "en_AU",
-    url: "https://edemseatery.com",
+    url: SITE_URL,
     siteName: "Edem's Eatery",
     images: [
       {
-        url: "https://edemseatery.com/og-image.jpg",
+        url: `${SITE_URL}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: "Edem's Eatery - Authentic Ghanaian Cuisine",
@@ -34,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Edem's Eatery - Authentic Ghanaian Cuisine",
     description: "Experience authentic Ghanaian cuisine in Liverpool, NSW",
-    images: ["https://edemseatery.com/twitter-image.jpg"],
+    images: [`${SITE_URL}/twitter-image.jpg`],
   },
   robots: {
     index: true,
