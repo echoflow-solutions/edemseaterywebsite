@@ -11,23 +11,30 @@ import Catering from '@/components/Catering';
 import Location from '@/components/Location';
 import Footer from '@/components/Footer';
 import FloatingOrderButton from '@/components/FloatingOrderButton';
+import { OrderProvider } from '@/components/OrderProvider';
+import OrderModeModal from '@/components/OrderModeModal';
+import CartDrawer from '@/components/CartDrawer';
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      <Navigation />
-      <Hero />
-      <About />
-      <ValueProps />
-      <DiningExperience />
-      <Menu />
-      <PopularItems />
-      <Gallery />
-      <Reviews />
-      <Catering />
-      <Location />
-      <Footer />
-      <FloatingOrderButton />
-    </div>
+    <OrderProvider>
+      <div className="min-h-screen">
+        <Navigation />
+        <Hero />
+        <About />
+        <ValueProps />
+        <DiningExperience />
+        <Menu />
+        <PopularItems />
+        <Gallery />
+        <Reviews />
+        <Catering />
+        <Location />
+        <Footer />
+        <FloatingOrderButton />
+        <OrderModeModal />
+        <CartDrawer />
+      </div>
+    </OrderProvider>
   );
 }

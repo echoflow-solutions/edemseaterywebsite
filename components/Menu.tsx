@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { UtensilsCrossed } from 'lucide-react';
+import { UtensilsCrossed, Minus, Plus } from 'lucide-react';
 import Image from 'next/image';
 import MenuPDFViewer from './MenuPDFViewer';
 import { menuSections } from '@/lib/menu';
-import { ORDER_URL } from '@/lib/site';
+import { useOrder } from './OrderProvider';
 
 const Menu = () => {
   const [isPDFOpen, setIsPDFOpen] = useState(false);
+  const { mode, openChooser, addItem, setQuantity, quantityOf } = useOrder();
+  const pickupMode = mode === 'pickup';
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -58,16 +60,26 @@ const Menu = () => {
 
               {/* Section Items Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-                {section.items.map((item, index) => (
+                {section.items.map((item, index) => {
+                  const orderable = item.priceCents !== null;
+                  const quantity = quantityOf(item.id);
+
+                  return (
                   <motion.div
-                    key={index}
+                    key={item.id}
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={inView ? { opacity: 1, scale: 1 } : {}}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+                    className={`group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden ${
+                      orderable ? 'cursor-pointer' : ''
+                    }`}
                     whileHover={{ y: -8, scale: 1.02 }}
                     onClick={() => {
-                      window.location.href = ORDER_URL;
+                      if (!orderable) return;
+                      // Before a mode is chosen, the item is remembered and
+                      // added once the customer picks pickup.
+                      if (pickupMode) addItem(item.id);
+                      else openChooser(item.id);
                     }}
                   >
                     {/* Image Section */}
@@ -96,11 +108,13 @@ const Menu = () => {
                       </div>
 
                       {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
-                        <span className="text-white font-bold text-lg bg-secondary/90 px-6 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                          Click to Order
-                        </span>
-                      </div>
+                      {orderable && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                          <span className="text-white font-bold text-lg bg-secondary/90 px-6 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            {pickupMode ? 'Add to order' : 'Click to Order'}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Content Section */}
@@ -109,12 +123,46 @@ const Menu = () => {
                         {item.name}
                       </h3>
                       <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">{item.description}</p>
+
+                      {/* Items priced by add-ons need modifiers we do not have yet */}
+                      {!orderable && (
+                        <p className="mt-3 text-xs font-semibold text-primary/60">
+                          Order this one in store or by phone
+                        </p>
+                      )}
+
+                      {/* Stepper, shown once the customer is ordering for pickup */}
+                      {pickupMode && orderable && quantity > 0 && (
+                        <div
+                          className="mt-4 flex items-center justify-between bg-secondary/15 rounded-full px-2 py-1.5"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setQuantity(item.id, quantity - 1)}
+                            aria-label={`Reduce ${item.name}`}
+                            className="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center hover:bg-secondary/30 transition-colors"
+                          >
+                            <Minus className="w-4 h-4 text-primary" />
+                          </button>
+                          <span className="font-bold text-primary">{quantity} in order</span>
+                          <button
+                            type="button"
+                            onClick={() => setQuantity(item.id, quantity + 1)}
+                            aria-label={`Add another ${item.name}`}
+                            className="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center hover:bg-secondary/30 transition-colors"
+                          >
+                            <Plus className="w-4 h-4 text-primary" />
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     {/* Decorative corner element */}
                     <div className="absolute -bottom-2 -right-2 w-24 h-24 bg-secondary/10 rounded-full filter blur-2xl group-hover:bg-secondary/30 transition-all duration-300"></div>
                   </motion.div>
-                ))}
+                  );
+                })}
               </div>
             </motion.div>
           ))}

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, ExternalLink } from 'lucide-react';
 import { ORDER_OPTIONS } from '@/lib/site';
+import { useOrder } from './OrderProvider';
 
 const navItems = [
   { label: 'Home', href: '#home' },
@@ -21,10 +22,19 @@ const Navigation = () => {
   const [takeawayOpen, setTakeawayOpen] = useState(false);
   const [expandedOption, setExpandedOption] = useState<string | null>(null);
   const takeawayRef = useRef<HTMLDivElement>(null);
+  const { chooseMode } = useOrder();
 
   const closeTakeaway = () => {
     setTakeawayOpen(false);
     setExpandedOption(null);
+  };
+
+  /** Switch to pickup ordering and drop the customer at the menu. */
+  const startPickup = () => {
+    chooseMode('pickup');
+    closeTakeaway();
+    setIsOpen(false);
+    document.querySelector('#menu')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -216,6 +226,24 @@ const Navigation = () => {
                           );
                         }
 
+                        // Pickup is handled in-app; everything else navigates.
+                        if (option.action === 'pickup') {
+                          return (
+                            <button
+                              key={option.label}
+                              role="menuitem"
+                              type="button"
+                              onClick={startPickup}
+                              className="block w-full text-left px-5 py-4 hover:bg-secondary/10 transition-colors duration-200 border-b border-gray-100 last:border-0"
+                            >
+                              <span className="block font-bold text-primary">{option.label}</span>
+                              <span className="block text-sm text-gray-500">
+                                {option.description}
+                              </span>
+                            </button>
+                          );
+                        }
+
                         return (
                           <a
                             key={option.label}
@@ -298,6 +326,16 @@ const Navigation = () => {
                     </a>
                   ))}
                 </div>
+              ) : option.action === 'pickup' ? (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={startPickup}
+                  className="w-full flex items-center justify-between px-3 py-2 text-white hover:text-secondary transition-colors duration-300"
+                >
+                  <span className="font-medium">{option.label}</span>
+                  <span className="text-white/50 text-sm">{option.description}</span>
+                </button>
               ) : (
                 <a
                   key={option.label}

@@ -61,6 +61,8 @@ export type OrderOption = {
   external?: boolean;
   /** Nested choices, used by delivery to offer each platform. */
   options?: OrderOption[];
+  /** Handled in-app rather than by navigating away. */
+  action?: 'pickup';
 };
 
 /**
@@ -87,7 +89,7 @@ export const DELIVERY_PLATFORMS: OrderOption[] = [
 
 /** Targets for the Takeaway menu in the navigation bar. */
 export const ORDER_OPTIONS: OrderOption[] = [
-  { label: 'Order for Pickup', description: 'Ready when you are', href: ORDER_URL },
+  { label: 'Order for Pickup', description: 'Build your order here', action: 'pickup' },
   {
     label: 'Order for Delivery',
     description: 'Uber Eats or DoorDash',

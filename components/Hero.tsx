@@ -3,10 +3,12 @@
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Phone } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
-import { RESTAURANT, ORDER_URL } from '@/lib/site';
+import { RESTAURANT } from '@/lib/site';
+import { useOrder } from './OrderProvider';
 
 const Hero = () => {
   const [mounted, setMounted] = useState(false);
+  const { openChooser } = useOrder();
 
   useEffect(() => {
     setMounted(true);
@@ -181,7 +183,7 @@ const Hero = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => window.location.href = ORDER_URL}
+              onClick={() => openChooser()}
               className="relative px-8 py-4 bg-secondary text-primary rounded-full font-bold text-lg btn-shimmer glow overflow-hidden group cursor-pointer"
             >
               <span className="relative z-10">ORDER NOW - Delivery &amp; Pickup</span>

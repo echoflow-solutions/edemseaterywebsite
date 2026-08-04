@@ -5,7 +5,7 @@ import { useInView } from 'react-intersection-observer';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { popularItems } from '@/lib/menu';
-import { ORDER_URL } from '@/lib/site';
+import { useOrder } from './OrderProvider';
 
 const GoldCaret = ({ pointsUp }: { pointsUp: boolean }) => (
   <svg
@@ -19,6 +19,7 @@ const GoldCaret = ({ pointsUp }: { pointsUp: boolean }) => (
 );
 
 const PopularItems = () => {
+  const { mode, addItem, openChooser, quantityOf } = useOrder();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -82,24 +83,33 @@ const PopularItems = () => {
           className="bg-olive flex items-center justify-center p-8 md:p-14"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-xl">
-            {popularItems.map((item, index) => (
-              <motion.button
-                key={item.name}
-                type="button"
-                onClick={() => {
-                  window.location.href = ORDER_URL;
-                }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.35 + index * 0.1 }}
-                whileHover={{ y: -4 }}
-                className="bg-white/10 hover:bg-white/20 transition-colors duration-300 rounded-lg p-6 text-center cursor-pointer"
-              >
-                <h3 className="text-white font-bold text-lg leading-snug mb-2">{item.name}</h3>
-                <p className="text-secondary font-semibold mb-3">{item.price}</p>
-                <GoldCaret pointsUp={index % 2 === 0} />
-              </motion.button>
-            ))}
+            {popularItems.map((item, index) => {
+              const quantity = quantityOf(item.id);
+              return (
+                <motion.button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    if (mode === 'pickup') addItem(item.id);
+                    else openChooser(item.id);
+                  }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.5, delay: 0.35 + index * 0.1 }}
+                  whileHover={{ y: -4 }}
+                  className="relative bg-white/10 hover:bg-white/20 transition-colors duration-300 rounded-lg p-6 text-center cursor-pointer"
+                >
+                  {quantity > 0 && (
+                    <span className="absolute top-2 right-2 min-w-[1.5rem] h-6 px-1.5 rounded-full bg-secondary text-primary text-sm font-bold flex items-center justify-center">
+                      {quantity}
+                    </span>
+                  )}
+                  <h3 className="text-white font-bold text-lg leading-snug mb-2">{item.name}</h3>
+                  <p className="text-secondary font-semibold mb-3">{item.price}</p>
+                  <GoldCaret pointsUp={index % 2 === 0} />
+                </motion.button>
+              );
+            })}
           </div>
         </motion.div>
       </div>

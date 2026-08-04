@@ -3,9 +3,11 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { MapPin, Clock, Phone, Mail, Car, Train, ParkingSquare, ArrowRight, ExternalLink } from 'lucide-react';
-import { RESTAURANT, ORDER_URL, OPENING_HOURS, MAP_EMBED_URL, DELIVERY_PLATFORMS } from '@/lib/site';
+import { RESTAURANT, OPENING_HOURS, MAP_EMBED_URL, DELIVERY_PLATFORMS } from '@/lib/site';
+import { useOrder } from './OrderProvider';
 
 const Location = () => {
+  const { chooseMode } = useOrder();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -191,7 +193,10 @@ const Location = () => {
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => window.location.href = ORDER_URL}
+                onClick={() => {
+                  chooseMode('pickup');
+                  document.querySelector('#menu')?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 className="w-full px-6 py-4 bg-secondary text-primary rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300 shadow-lg"
               >
                 ORDER FOR PICKUP
