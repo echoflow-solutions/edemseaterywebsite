@@ -2,7 +2,18 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Trash2, ShoppingBag, Clock, AlertCircle, Phone } from 'lucide-react';
+import {
+  X,
+  Minus,
+  Plus,
+  Trash2,
+  ShoppingBag,
+  Clock,
+  AlertCircle,
+  Phone,
+  ArrowLeft,
+  Loader2,
+} from 'lucide-react';
 import { useOrder } from './OrderProvider';
 import { findMenuItem, formatCents } from '@/lib/menu';
 import { getPickupAvailability, PICKUP_SETTINGS } from '@/lib/hours';
@@ -19,7 +30,16 @@ const CartDrawer = () => {
     clearCart,
     pickupWhen,
     setPickupWhen,
+    checkoutEnabled,
   } = useOrder();
+
+  const [step, setStep] = useState<'cart' | 'details'>('cart');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [note, setNote] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Availability depends on the current time, so it is resolved on the client
   // after mount. Rendering it during SSR would bake in the build time.
@@ -76,6 +96,56 @@ const CartDrawer = () => {
 
   const orderingBlocked = availability !== null && allSlots.length === 0;
 
+  // Reset back to the item list whenever the drawer is dismissed.
+  useEffect(() => {
+    if (!cartOpen) {
+      setStep('cart');
+      setSubmitError(null);
+    }
+  }, [cartOpen]);
+
+  const detailsValid = name.trim().length >= 2 && phone.trim().length >= 8;
+
+  const handlePay = async () => {
+    if (!detailsValid || submitting) return;
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          // Ids and quantities only — the server prices the order.
+          lines,
+          pickupAt: pickupWhen.type === 'scheduled' ? pickupWhen.value : null,
+          customer: {
+            name: name.trim(),
+            phone: phone.trim(),
+            email: email.trim() || undefined,
+          },
+          note: note.trim() || undefined,
+        }),
+      });
+
+      const payload: { url?: string; error?: string } = await response
+        .json()
+        .catch(() => ({}));
+
+      if (!response.ok || !payload.url) {
+        setSubmitError(payload.error ?? 'We could not start the payment. Please try again.');
+        setSubmitting(false);
+        return;
+      }
+
+      // Hand off to Square's hosted checkout page.
+      window.location.href = payload.url;
+    } catch {
+      setSubmitError('We could not reach the payment service. Please check your connection.');
+      setSubmitting(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       {cartOpen && (
@@ -115,7 +185,100 @@ const CartDrawer = () => {
               </button>
             </header>
 
-            {/* Lines */}
+            {/* Details step */}
+            {step === 'details' ? (
+              <div className="flex-1 overflow-y-auto px-5 py-4">
+                <button
+                  type="button"
+                  onClick={() => setStep('cart')}
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-secondary transition-colors mb-4"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to your order
+                </button>
+
+                <div className="bg-white rounded-xl p-4 shadow-sm space-y-4">
+                  <div>
+                    <label htmlFor="cart-name" className="block font-semibold text-primary mb-1">
+                      Name for the order <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      id="cart-name"
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                      autoComplete="name"
+                      className="w-full rounded-lg border border-primary/20 px-3 py-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="cart-phone" className="block font-semibold text-primary mb-1">
+                      Mobile number <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      id="cart-phone"
+                      value={phone}
+                      onChange={(event) => setPhone(event.target.value)}
+                      type="tel"
+                      autoComplete="tel"
+                      placeholder="04XX XXX XXX"
+                      className="w-full rounded-lg border border-primary/20 px-3 py-2"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      So we can reach you if there is a question about your order.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="cart-email" className="block font-semibold text-primary mb-1">
+                      Email <span className="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <input
+                      id="cart-email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      type="email"
+                      autoComplete="email"
+                      className="w-full rounded-lg border border-primary/20 px-3 py-2"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Square emails your receipt to whatever address you enter at payment.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="cart-note" className="block font-semibold text-primary mb-1">
+                      Notes for the kitchen{' '}
+                      <span className="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <textarea
+                      id="cart-note"
+                      value={note}
+                      onChange={(event) => setNote(event.target.value)}
+                      rows={3}
+                      maxLength={300}
+                      className="w-full rounded-lg border border-primary/20 px-3 py-2"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Allergies? Please call us as well — our kitchen handles nuts, fish, egg,
+                      soy, sesame, milk and gluten.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 shadow-sm mt-4">
+                  <p className="font-semibold text-primary mb-1">Collecting</p>
+                  <p className="text-gray-600 text-sm">
+                    {pickupWhen.type === 'asap'
+                      ? (availability?.asapLabel ?? 'As soon as possible')
+                      : pickupWhen.label}
+                  </p>
+                  <p className="text-gray-600 text-sm mt-2">{RESTAURANT.addressShort}</p>
+                </div>
+              </div>
+            ) : (
+
+            /* Cart step */
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {cartRows.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center py-12">
@@ -275,6 +438,7 @@ const CartDrawer = () => {
                 </section>
               )}
             </div>
+            )}
 
             {/* Footer */}
             <footer className="flex-shrink-0 border-t border-primary/10 bg-white px-5 py-4 space-y-3">
@@ -285,40 +449,72 @@ const CartDrawer = () => {
                 </span>
               </div>
 
-              {/*
-                Card payment is deliberately inert until Square credentials are
-                in place. Rather than dead-end the customer, the existing
-                ordering page and phone number stay reachable underneath.
-              */}
-              <button
-                type="button"
-                disabled
-                className="w-full px-6 py-4 rounded-full font-bold bg-gray-200 text-gray-500 cursor-not-allowed"
-              >
-                Card payment coming soon
-              </button>
-
-              <p className="text-xs text-center text-gray-500">
-                Online card payment goes live once Square is connected. Until then:
-              </p>
-
-              <div className="grid grid-cols-2 gap-3">
-                <a
-                  href={ORDER_URL}
-                  className="text-center px-4 py-3 rounded-full font-bold bg-secondary text-primary hover:bg-secondary/90 transition-colors text-sm"
+              {submitError && (
+                <p
+                  role="alert"
+                  className="flex items-start gap-2 text-sm text-red-700 bg-red-50 rounded-lg p-3"
                 >
-                  Ordering page
-                </a>
-                <a
-                  href={RESTAURANT.phoneHref}
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-full font-bold border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors text-sm"
-                >
-                  <Phone className="w-4 h-4" />
-                  Call us
-                </a>
-              </div>
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  {submitError}
+                </p>
+              )}
 
-              {cartRows.length > 0 && (
+              {checkoutEnabled ? (
+                step === 'cart' ? (
+                  <button
+                    type="button"
+                    onClick={() => setStep('details')}
+                    disabled={itemCount === 0 || orderingBlocked}
+                    className="w-full px-6 py-4 rounded-full font-bold bg-secondary text-primary hover:bg-secondary/90 transition-colors disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  >
+                    Continue to details
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handlePay}
+                    disabled={!detailsValid || submitting}
+                    className="w-full px-6 py-4 rounded-full font-bold bg-secondary text-primary hover:bg-secondary/90 transition-colors disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {submitting && <Loader2 className="w-5 h-5 animate-spin" />}
+                    {submitting ? 'Taking you to payment' : 'Pay securely with Square'}
+                  </button>
+                )
+              ) : (
+                <>
+                  {/*
+                    No Square credentials configured. Rather than dead-end the
+                    customer, the existing ordering page and phone stay usable.
+                  */}
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full px-6 py-4 rounded-full font-bold bg-gray-200 text-gray-500 cursor-not-allowed"
+                  >
+                    Card payment coming soon
+                  </button>
+                  <p className="text-xs text-center text-gray-500">
+                    Online card payment goes live once Square is connected. Until then:
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <a
+                      href={ORDER_URL}
+                      className="text-center px-4 py-3 rounded-full font-bold bg-secondary text-primary hover:bg-secondary/90 transition-colors text-sm"
+                    >
+                      Ordering page
+                    </a>
+                    <a
+                      href={RESTAURANT.phoneHref}
+                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-full font-bold border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors text-sm"
+                    >
+                      <Phone className="w-4 h-4" />
+                      Call us
+                    </a>
+                  </div>
+                </>
+              )}
+
+              {cartRows.length > 0 && step === 'cart' && (
                 <button
                   type="button"
                   onClick={clearCart}

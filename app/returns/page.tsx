@@ -33,6 +33,18 @@ const sections: LegalSection[] = [
     ],
   },
   {
+    heading: 'Orders paid online',
+    paragraphs: [
+      'Pickup orders paid by card on this website are processed by Square, and any refund is issued back through Square to the card you paid with.',
+    ],
+    bullets: [
+      'Cancel before the kitchen has started your order and we will refund it in full. Call us as soon as you can, especially for a pre-order placed for a later day.',
+      'Once cooking has started we cannot refund a change of mind, though your rights above for a wrong, missing or poor-quality order still apply in full.',
+      'If you do not collect a paid order and have not contacted us, the food is held until closing that day and cannot be refunded afterwards.',
+      'If a payment is taken but no order reaches us, tell us straight away and we will refund it.',
+    ],
+  },
+  {
     heading: 'How refunds are paid',
     bullets: [
       'Refunds go back to the original payment method.',

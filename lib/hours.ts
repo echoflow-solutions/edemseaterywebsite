@@ -23,7 +23,7 @@ export const PICKUP_SETTINGS = {
    * How many future trading days can be pre-ordered, beyond today. Closed
    * days are skipped, so on a Sunday this offers Tuesday rather than Monday.
    */
-  preOrderDays: 1,
+  preOrderDays: 3,
 } as const;
 
 type Weekday = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat';

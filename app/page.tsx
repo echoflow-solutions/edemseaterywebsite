@@ -16,8 +16,13 @@ import OrderModeModal from '@/components/OrderModeModal';
 import CartDrawer from '@/components/CartDrawer';
 
 export default function Home() {
+  // Read server-side so the token itself never reaches the browser bundle.
+  const checkoutEnabled = Boolean(
+    process.env.SQUARE_ACCESS_TOKEN && process.env.SQUARE_LOCATION_ID
+  );
+
   return (
-    <OrderProvider>
+    <OrderProvider checkoutEnabled={checkoutEnabled}>
       <div className="min-h-screen">
         <Navigation />
         <Hero />

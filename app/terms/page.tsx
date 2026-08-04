@@ -23,6 +23,19 @@ const sections: LegalSection[] = [
     ],
   },
   {
+    heading: 'Ordering and paying online',
+    paragraphs: [
+      'When you place a pickup order on this website, your card payment is processed by Square. We never see or store your card number — it goes directly to Square.',
+      'Your order is confirmed once payment succeeds. Square emails you a receipt at that point, and the order is sent to our kitchen. If payment fails, no order reaches us, so please try again or give us a call.',
+    ],
+    bullets: [
+      'You choose a pickup time when you order, either as soon as possible or a later slot. We prepare your food for that time.',
+      'Pre-orders can be placed for upcoming trading days. Payment is taken when you order, not on the day you collect.',
+      'Prices shown at checkout are in Australian dollars and include GST.',
+      'If we cannot fulfil an order you have already paid for, we will contact you and refund it in full.',
+    ],
+  },
+  {
     heading: 'Pickup and delivery',
     bullets: [
       'Pickup times are estimates. Busy periods can add to the wait, and we will tell you if your order will take noticeably longer.',

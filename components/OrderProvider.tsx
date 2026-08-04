@@ -46,6 +46,9 @@ type OrderContextValue = {
 
   pickupWhen: PickupWhen;
   setPickupWhen: (when: PickupWhen) => void;
+
+  /** True when Square credentials are present, so card payment can be offered. */
+  checkoutEnabled: boolean;
 };
 
 const OrderContext = createContext<OrderContextValue | null>(null);
@@ -79,7 +82,13 @@ const readStoredCart = (): CartLine[] => {
   }
 };
 
-export const OrderProvider = ({ children }: { children: ReactNode }) => {
+export const OrderProvider = ({
+  children,
+  checkoutEnabled = false,
+}: {
+  children: ReactNode;
+  checkoutEnabled?: boolean;
+}) => {
   const [mode, setMode] = useState<OrderMode | null>(null);
   const [chooserOpen, setChooserOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -202,8 +211,10 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       clearCart,
       pickupWhen,
       setPickupWhen,
+      checkoutEnabled,
     }),
     [
+      checkoutEnabled,
       mode,
       chooseMode,
       resetMode,
