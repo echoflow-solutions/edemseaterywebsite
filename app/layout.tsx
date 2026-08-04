@@ -37,7 +37,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Edem's Eatery - Authentic Ghanaian Cuisine",
     description: "Experience authentic Ghanaian cuisine in Liverpool, NSW",
-    images: [`${SITE_URL}/twitter-image.jpg`],
+    // 1200x630 suits summary_large_image, so the Open Graph image is reused.
+    images: [`${SITE_URL}/og-image.jpg`],
   },
   robots: {
     index: true,
