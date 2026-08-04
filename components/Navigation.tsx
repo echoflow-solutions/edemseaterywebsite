@@ -29,12 +29,11 @@ const Navigation = () => {
     setExpandedOption(null);
   };
 
-  /** Switch to pickup ordering and drop the customer at the menu. */
+  /** Switch to pickup ordering. chooseMode decides where to send the customer. */
   const startPickup = () => {
     chooseMode('pickup');
     closeTakeaway();
     setIsOpen(false);
-    document.querySelector('#menu')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {

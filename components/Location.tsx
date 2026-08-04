@@ -193,10 +193,7 @@ const Location = () => {
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => {
-                  chooseMode('pickup');
-                  document.querySelector('#menu')?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={() => chooseMode('pickup')}
                 className="w-full px-6 py-4 bg-secondary text-primary rounded-full font-bold btn-shimmer glow hover:bg-secondary/90 transition-all duration-300 shadow-lg"
               >
                 ORDER FOR PICKUP

@@ -154,20 +154,41 @@ export const OrderProvider = ({
     setPendingItemId(null);
   }, []);
 
+  /**
+   * Scroll to the menu, deferred so the chooser's scroll lock is released and
+   * its exit animation has finished. Scrolling while the body is still locked
+   * silently does nothing.
+   */
+  const goToMenu = useCallback(() => {
+    window.setTimeout(() => {
+      document.querySelector('#menu')?.scrollIntoView({ behavior: 'smooth' });
+    }, 220);
+  }, []);
+
   const chooseMode = useCallback(
     (next: OrderMode) => {
       setMode(next);
       setChooserOpen(false);
+
       if (next === 'pickup') {
-        // Carry through whatever the customer was trying to order.
+        // Choosing pickup must always land somewhere, or the modal just closes
+        // and the customer is left looking at the page they started on.
         if (pendingItemId) {
+          // Carry through whatever the customer was trying to order.
           addItem(pendingItemId);
           setCartOpen(true);
+        } else if (lines.length > 0) {
+          // An order is already underway — show it.
+          setCartOpen(true);
+        } else {
+          // Nothing to show yet, so send them to the food.
+          goToMenu();
         }
       }
+
       setPendingItemId(null);
     },
-    [addItem, pendingItemId]
+    [addItem, goToMenu, lines.length, pendingItemId]
   );
 
   const resetMode = useCallback(() => setMode(null), []);
