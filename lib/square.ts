@@ -11,6 +11,7 @@
  */
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { GST } from './site';
 
 /** Pinned so a Square API change can never alter behaviour without a deploy. */
 const SQUARE_VERSION = '2026-07-15';
@@ -90,6 +91,18 @@ export const createPaymentLink = async (
       order: {
         location_id: config.locationId,
         line_items: input.lineItems,
+        // INCLUSIVE means Square extracts the GST already contained in the
+        // menu price instead of adding it on top, so the customer still pays
+        // the advertised amount and the tax is reported correctly.
+        taxes: [
+          {
+            uid: 'gst',
+            name: GST.name,
+            percentage: GST.percentage,
+            type: 'INCLUSIVE',
+            scope: 'ORDER',
+          },
+        ],
         fulfillments: [
           {
             type: 'PICKUP',

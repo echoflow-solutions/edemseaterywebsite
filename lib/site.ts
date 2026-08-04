@@ -28,6 +28,20 @@ export const SITE_URL = 'https://edemseatery.com.au';
 export const ORDER_URL = 'https://orders.wowapps.com/order/edemseatery?src=web';
 
 /**
+ * Australian GST.
+ *
+ * Menu prices already include GST, so this is recorded as an inclusive tax:
+ * Square back-calculates the GST component out of the price rather than
+ * adding it on top. Without it Square reports $0 tax collected on every
+ * online order, which makes BAS reporting wrong.
+ */
+export const GST = {
+  name: 'GST',
+  /** Percentage as a plain string, the format Square expects. */
+  percentage: '10',
+} as const;
+
+/**
  * Keyless Google Maps embed resolved from the street address. The previous
  * embed used hand-written coordinates that did not resolve to the venue.
  */
