@@ -86,8 +86,12 @@ const Menu = () => {
                         </div>
                       )}
 
-                      {/* Price Badge */}
-                      <div className="absolute top-4 right-4 bg-secondary text-primary px-4 py-2 rounded-full font-bold text-lg shadow-lg glow">
+                      {/* Price Badge — shrinks for items priced by add-ons */}
+                      <div
+                        className={`absolute top-4 right-4 bg-secondary text-primary px-4 py-2 rounded-full font-bold shadow-lg glow whitespace-nowrap ${
+                          item.price.startsWith('$') ? 'text-lg' : 'text-xs'
+                        }`}
+                      >
                         {item.price}
                       </div>
 
