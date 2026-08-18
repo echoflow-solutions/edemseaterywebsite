@@ -3,15 +3,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { UtensilsCrossed, Minus, Plus } from 'lucide-react';
+import { UtensilsCrossed, Check } from 'lucide-react';
 import Image from 'next/image';
 import MenuPDFViewer from './MenuPDFViewer';
-import { menuSections } from '@/lib/menu';
+import { menuSections, displayPrice, hasOptions, minPriceCents } from '@/lib/menu';
 import { useOrder } from './OrderProvider';
 
 const Menu = () => {
   const [isPDFOpen, setIsPDFOpen] = useState(false);
-  const { mode, openChooser, addItem, setQuantity, quantityOf } = useOrder();
+  const { mode, openChooser, addItem, openOptions, quantityOf } = useOrder();
   const pickupMode = mode === 'pickup';
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -61,8 +61,9 @@ const Menu = () => {
               {/* Section Items Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
                 {section.items.map((item, index) => {
-                  const orderable = item.priceCents !== null;
+                  const orderable = minPriceCents(item) !== null;
                   const quantity = quantityOf(item.id);
+                  const needsChoices = hasOptions(item);
 
                   return (
                   <motion.div
@@ -77,9 +78,10 @@ const Menu = () => {
                     onClick={() => {
                       if (!orderable) return;
                       // Before a mode is chosen, the item is remembered and
-                      // added once the customer picks pickup.
-                      if (pickupMode) addItem(item.id);
-                      else openChooser(item.id);
+                      // handled once the customer picks pickup.
+                      if (!pickupMode) openChooser(item.id);
+                      else if (needsChoices) openOptions(item.id);
+                      else addItem(item.id);
                     }}
                   >
                     {/* Image Section */}
@@ -101,17 +103,17 @@ const Menu = () => {
                       {/* Price Badge — shrinks for items priced by add-ons */}
                       <div
                         className={`absolute top-4 right-4 bg-secondary text-primary px-4 py-2 rounded-full font-bold shadow-lg glow whitespace-nowrap ${
-                          item.price.startsWith('$') ? 'text-lg' : 'text-xs'
+                          displayPrice(item).startsWith('$') ? 'text-lg' : 'text-sm'
                         }`}
                       >
-                        {item.price}
+                        {displayPrice(item)}
                       </div>
 
                       {/* Hover Overlay */}
                       {orderable && (
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
                           <span className="text-white font-bold text-lg bg-secondary/90 px-6 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                            {pickupMode ? 'Add to order' : 'Click to Order'}
+                            {pickupMode ? (needsChoices ? 'Choose options' : 'Add to order') : 'Click to Order'}
                           </span>
                         </div>
                       )}
@@ -131,30 +133,13 @@ const Menu = () => {
                         </p>
                       )}
 
-                      {/* Stepper, shown once the customer is ordering for pickup */}
+                      {/* Quantities live in the cart now, because the same dish
+                          can be in an order twice with different options. */}
                       {pickupMode && orderable && quantity > 0 && (
-                        <div
-                          className="mt-4 flex items-center justify-between bg-secondary/15 rounded-full px-2 py-1.5"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <button
-                            type="button"
-                            onClick={() => setQuantity(item.id, quantity - 1)}
-                            aria-label={`Reduce ${item.name}`}
-                            className="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center hover:bg-secondary/30 transition-colors"
-                          >
-                            <Minus className="w-4 h-4 text-primary" />
-                          </button>
-                          <span className="font-bold text-primary">{quantity} in order</span>
-                          <button
-                            type="button"
-                            onClick={() => setQuantity(item.id, quantity + 1)}
-                            aria-label={`Add another ${item.name}`}
-                            className="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center hover:bg-secondary/30 transition-colors"
-                          >
-                            <Plus className="w-4 h-4 text-primary" />
-                          </button>
-                        </div>
+                        <p className="mt-4 inline-flex items-center gap-2 bg-secondary/15 text-primary font-bold rounded-full px-4 py-1.5 text-sm">
+                          <Check className="w-4 h-4" />
+                          {quantity} in your order
+                        </p>
                       )}
                     </div>
 

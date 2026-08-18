@@ -15,7 +15,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useOrder } from './OrderProvider';
-import { findMenuItem, formatCents } from '@/lib/menu';
+import { findMenuItem, formatCents, priceSelection, describeSelections } from '@/lib/menu';
 import { getPickupAvailability, PICKUP_SETTINGS } from '@/lib/hours';
 import { RESTAURANT, ORDER_URL } from '@/lib/site';
 
@@ -88,11 +88,13 @@ const CartDrawer = () => {
     }
   }, [availability, allSlots, pickupWhen, setPickupWhen]);
 
-  const cartRows = lines
-    .map((line) => ({ line, item: findMenuItem(line.id) }))
-    .filter((row): row is { line: typeof row.line; item: NonNullable<typeof row.item> } =>
-      row.item !== undefined
-    );
+  const cartRows = lines.flatMap((line) => {
+    const item = findMenuItem(line.id);
+    if (!item) return [];
+    const unitCents = priceSelection(item, line.options);
+    if (unitCents === null) return [];
+    return [{ line, item, unitCents, detail: describeSelections(item, line.options) }];
+  });
 
   const orderingBlocked = availability !== null && allSlots.length === 0;
 
@@ -116,8 +118,12 @@ const CartDrawer = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          // Ids and quantities only — the server prices the order.
-          lines,
+          // Ids, quantities and option choices only — the server prices it.
+          lines: lines.map((line) => ({
+            id: line.id,
+            quantity: line.quantity,
+            options: line.options,
+          })),
           pickupAt: pickupWhen.type === 'scheduled' ? pickupWhen.value : null,
           customer: {
             name: name.trim(),
@@ -292,21 +298,22 @@ const CartDrawer = () => {
                 </div>
               ) : (
                 <ul className="space-y-3">
-                  {cartRows.map(({ line, item }) => (
+                  {cartRows.map(({ line, item, unitCents, detail }) => (
                     <li
-                      key={line.id}
+                      key={line.key}
                       className="bg-white rounded-xl p-4 shadow-sm flex items-start gap-3"
                     >
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-primary leading-snug">{item.name}</p>
-                        <p className="text-sm text-gray-500">
-                          {item.priceCents !== null ? formatCents(item.priceCents) : item.price} each
-                        </p>
+                        {detail && (
+                          <p className="text-sm text-primary/70 leading-snug">{detail}</p>
+                        )}
+                        <p className="text-sm text-gray-500">{formatCents(unitCents)} each</p>
 
                         <div className="flex items-center gap-2 mt-3">
                           <button
                             type="button"
-                            onClick={() => setQuantity(line.id, line.quantity - 1)}
+                            onClick={() => setQuantity(line.key, line.quantity - 1)}
                             aria-label={`Reduce ${item.name}`}
                             className="w-8 h-8 rounded-full border border-primary/20 hover:bg-secondary/20 flex items-center justify-center transition-colors"
                           >
@@ -321,7 +328,7 @@ const CartDrawer = () => {
                           </span>
                           <button
                             type="button"
-                            onClick={() => setQuantity(line.id, line.quantity + 1)}
+                            onClick={() => setQuantity(line.key, line.quantity + 1)}
                             aria-label={`Add another ${item.name}`}
                             className="w-8 h-8 rounded-full border border-primary/20 hover:bg-secondary/20 flex items-center justify-center transition-colors"
                           >
@@ -331,9 +338,7 @@ const CartDrawer = () => {
                       </div>
 
                       <p className="font-bold text-primary whitespace-nowrap">
-                        {item.priceCents !== null
-                          ? formatCents(item.priceCents * line.quantity)
-                          : '—'}
+                        {formatCents(unitCents * line.quantity)}
                       </p>
                     </li>
                   ))}

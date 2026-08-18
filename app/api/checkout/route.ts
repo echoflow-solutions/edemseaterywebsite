@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { randomUUID } from 'node:crypto';
-import { findMenuItem } from '@/lib/menu';
+import { findMenuItem, priceSelection, describeSelections, type OptionSelections } from '@/lib/menu';
 import { getPickupAvailability } from '@/lib/hours';
 import { createPaymentLink, getSquareConfig, type PaymentLineItem } from '@/lib/square';
 import { SITE_URL } from '@/lib/site';
@@ -9,7 +9,7 @@ const CURRENCY = 'AUD';
 const MAX_LINES = 40;
 const MAX_QUANTITY_PER_LINE = 20;
 
-type IncomingLine = { id: string; quantity: number };
+type IncomingLine = { id: string; quantity: number; options: OptionSelections };
 
 type CheckoutRequest = {
   lines: IncomingLine[];
@@ -46,7 +46,22 @@ const parseBody = (body: unknown): CheckoutRequest | null => {
     ) {
       return null;
     }
-    lines.push({ id: line.id, quantity: line.quantity });
+    // Options arrive as a flat { groupId: choiceId } map of strings. Anything
+    // else is rejected outright rather than coerced.
+    const rawOptions = (line as { options?: unknown }).options;
+    const options: OptionSelections = {};
+    if (rawOptions !== undefined) {
+      if (typeof rawOptions !== 'object' || rawOptions === null || Array.isArray(rawOptions)) {
+        return null;
+      }
+      for (const [group, choice] of Object.entries(rawOptions)) {
+        if (typeof group !== 'string' || typeof choice !== 'string') return null;
+        if (group.length > 40 || choice.length > 60) return null;
+        options[group] = choice;
+      }
+    }
+
+    lines.push({ id: line.id, quantity: line.quantity, options });
   }
 
   const customer = candidate.customer;
@@ -97,13 +112,22 @@ export async function POST(request: NextRequest) {
     if (!item) {
       return failure('One of those dishes is no longer on the menu. Please review your order.', 409);
     }
-    if (item.priceCents === null) {
-      return failure(`${item.name} can only be ordered in store or by phone.`, 409);
+    // priceSelection rejects a missing, unknown or mismatched option, so a
+    // forged combination cannot produce a price.
+    const unitCents = priceSelection(item, line.options);
+    if (unitCents === null) {
+      return failure(
+        `We could not price "${item.name}" with those choices. Please re-add it to your order.`,
+        409
+      );
     }
+
+    const detail = describeSelections(item, line.options);
     lineItems.push({
-      name: item.name,
+      // The kitchen docket shows the choices, e.g. "Light Soup (Fufu · Goat)".
+      name: detail ? `${item.name} (${detail})` : item.name,
       quantity: String(line.quantity),
-      base_price_money: { amount: item.priceCents, currency: CURRENCY },
+      base_price_money: { amount: unitCents, currency: CURRENCY },
     });
   }
 

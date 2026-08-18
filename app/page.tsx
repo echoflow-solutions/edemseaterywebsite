@@ -14,6 +14,7 @@ import FloatingOrderButton from '@/components/FloatingOrderButton';
 import { OrderProvider } from '@/components/OrderProvider';
 import OrderModeModal from '@/components/OrderModeModal';
 import CartDrawer from '@/components/CartDrawer';
+import ItemOptionsModal from '@/components/ItemOptionsModal';
 
 export default function Home() {
   // Read server-side so the token itself never reaches the browser bundle.
@@ -39,6 +40,7 @@ export default function Home() {
         <FloatingOrderButton />
         <OrderModeModal />
         <CartDrawer />
+        <ItemOptionsModal />
       </div>
     </OrderProvider>
   );

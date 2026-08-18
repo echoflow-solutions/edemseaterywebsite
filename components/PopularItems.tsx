@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
-import { popularItems } from '@/lib/menu';
+import { popularItems, displayPrice, hasOptions } from '@/lib/menu';
 import { useOrder } from './OrderProvider';
 
 const GoldCaret = ({ pointsUp }: { pointsUp: boolean }) => (
@@ -19,7 +19,7 @@ const GoldCaret = ({ pointsUp }: { pointsUp: boolean }) => (
 );
 
 const PopularItems = () => {
-  const { mode, addItem, openChooser, quantityOf } = useOrder();
+  const { mode, addItem, openChooser, openOptions, quantityOf } = useOrder();
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -90,8 +90,9 @@ const PopularItems = () => {
                   key={item.id}
                   type="button"
                   onClick={() => {
-                    if (mode === 'pickup') addItem(item.id);
-                    else openChooser(item.id);
+                    if (mode !== 'pickup') openChooser(item.id);
+                    else if (hasOptions(item)) openOptions(item.id);
+                    else addItem(item.id);
                   }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -105,7 +106,7 @@ const PopularItems = () => {
                     </span>
                   )}
                   <h3 className="text-white font-bold text-lg leading-snug mb-2">{item.name}</h3>
-                  <p className="text-secondary font-semibold mb-3">{item.price}</p>
+                  <p className="text-secondary font-semibold mb-3">{displayPrice(item)}</p>
                   <GoldCaret pointsUp={index % 2 === 0} />
                 </motion.button>
               );
