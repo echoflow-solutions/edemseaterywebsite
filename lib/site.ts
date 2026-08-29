@@ -18,8 +18,8 @@ export const RESTAURANT = {
   phoneHref: 'tel:0272388800',
   email: 'info@edemseatery.com.au',
   established: '2024',
-  /** Short trading summary. Monday is closed, so never "7 days a week". */
-  openingSummary: 'Open Tue – Sun',
+  /** Short trading summary. Confirmed with the owner on 19 August 2026. */
+  openingSummary: 'Open 7 days',
 } as const;
 
 /** Public origin of the site. Used to build absolute metadata URLs. */
@@ -61,9 +61,9 @@ export type OpeningHour = {
 };
 
 export const OPENING_HOURS: OpeningHour[] = [
-  { day: 'Tuesday - Saturday', time: '11:00 AM - 8:00 PM' },
-  { day: 'Sunday', time: '1:00 PM - 8:00 PM' },
-  { day: 'Monday', time: 'CLOSED', closed: true },
+  { day: 'Monday - Wednesday', time: '11:00 AM - 8:00 PM' },
+  { day: 'Thursday - Saturday', time: '11:00 AM - 9:00 PM' },
+  { day: 'Sunday', time: '1:00 PM - 9:00 PM' },
 ];
 
 export type OrderOption = {

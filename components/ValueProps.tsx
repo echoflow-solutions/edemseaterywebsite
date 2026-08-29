@@ -99,7 +99,7 @@ const ValueProps = () => {
 
             <div className="w-full max-w-xs border-t border-dashed border-primary/20 pt-6">
               <p className="font-script text-2xl text-primary/70">We are open</p>
-              <p className="text-xl font-bold text-primary mt-1">Tuesday &ndash; Sunday</p>
+              <p className="text-xl font-bold text-primary mt-1">7 days a week</p>
             </div>
 
             <div className="w-full max-w-xs border-t border-dashed border-primary/20 mt-6 pt-6">

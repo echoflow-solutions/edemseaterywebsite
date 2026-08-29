@@ -21,7 +21,8 @@ export const PICKUP_SETTINGS = {
   lastOrderBufferMinutes: 30,
   /**
    * How many future trading days can be pre-ordered, beyond today. Closed
-   * days are skipped, so on a Sunday this offers Tuesday rather than Monday.
+   * days are skipped. The venue currently trades every day, so this simply
+   * walks forward through the calendar.
    */
   preOrderDays: 3,
 } as const;
@@ -30,13 +31,13 @@ type Weekday = 'Sun' | 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat';
 
 /** Opening window per weekday, in minutes from midnight. null means closed. */
 const TRADING_WINDOWS: Record<Weekday, { open: number; close: number } | null> = {
-  Mon: null,
+  Mon: { open: 11 * 60, close: 20 * 60 },
   Tue: { open: 11 * 60, close: 20 * 60 },
   Wed: { open: 11 * 60, close: 20 * 60 },
-  Thu: { open: 11 * 60, close: 20 * 60 },
-  Fri: { open: 11 * 60, close: 20 * 60 },
-  Sat: { open: 11 * 60, close: 20 * 60 },
-  Sun: { open: 13 * 60, close: 20 * 60 },
+  Thu: { open: 11 * 60, close: 21 * 60 },
+  Fri: { open: 11 * 60, close: 21 * 60 },
+  Sat: { open: 11 * 60, close: 21 * 60 },
+  Sun: { open: 13 * 60, close: 21 * 60 },
 };
 
 const WEEKDAY_NAMES: Record<Weekday, string> = {

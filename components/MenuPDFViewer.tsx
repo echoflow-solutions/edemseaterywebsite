@@ -31,8 +31,8 @@ const MenuPDFViewer = ({ isOpen, onClose }: MenuPDFViewerProps) => {
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.href = '/Edems-Eatery-Menu-2025.pdf';
-    link.download = 'Edems-Eatery-Menu-2025.pdf';
+    link.href = '/Edems-Eatery-Menu-2026.pdf';
+    link.download = 'Edems-Eatery-Menu-2026.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -180,7 +180,7 @@ const MenuPDFViewer = ({ isOpen, onClose }: MenuPDFViewerProps) => {
             }}
           >
             <iframe
-              src="/Edems-Eatery-Menu-2025.pdf#toolbar=1&navpanes=0&scrollbar=1&view=FitH"
+              src="/Edems-Eatery-Menu-2026.pdf#toolbar=1&navpanes=0&scrollbar=1&view=FitH"
               style={{
                 width: '100%',
                 height: '100%',

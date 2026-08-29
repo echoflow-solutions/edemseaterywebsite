@@ -219,7 +219,7 @@ const Hero = () => {
         >
           {[
             { icon: MapPin, text: RESTAURANT.addressShort },
-            { icon: Clock, text: 'Tue-Sat: 11AM-8PM, Sun: 1PM-8PM' },
+            { icon: Clock, text: 'Mon-Wed 11AM-8PM, Thu-Sat 11AM-9PM, Sun 1PM-9PM' },
             { icon: Phone, text: RESTAURANT.phoneDisplay },
           ].map((item, index) => (
             <motion.div

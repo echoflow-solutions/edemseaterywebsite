@@ -1,8 +1,10 @@
 /**
  * Menu data and pricing.
  *
- * Source of truth: "MENU BOOK - OFFICIAL (3)", dated 18 August 2026. These are
- * the restaurant's direct prices, not the marked-up delivery-platform prices.
+ * Source of truth: "MENU BOOK - OFFICIAL (3)", dated 18 August 2026, plus
+ * corrections confirmed by the owner on 19 August 2026 (Kelewele $15, Kokoo
+ * $10, and Banku/Kenkey served with fish at $30). These are the restaurant's
+ * direct prices, not the marked-up delivery-platform prices.
  *
  * Some dishes are priced by the option chosen rather than by a flat figure —
  * a Jollof Rice costs $25 with chicken and $30 with fried fish — so an item's
@@ -134,7 +136,7 @@ export const menuData: Record<string, MenuItem[]> = {
   appetizers: buildSection('appetizers', [
     { name: 'Chinchinga (Suya/Kebab)', price: '$12.00', description: 'Tender chunks of beef or chicken grilled to perfection, coated in a smoky, spicy rub. Ghanaian street food at its best.', image: '/media/kebab.jpg' },
     {
-      name: 'Kelewele (Spiced Plantain)', price: '$10.00', image: '/media/beans-plantain.jpg',
+      name: 'Kelewele (Spiced Plantain)', price: '$15.00', image: '/media/beans-plantain.jpg',
       description: 'Ripe plantains marinated in ginger, pepper and aromatic spices, fried until golden. Sweet, spicy and fragrant.',
       options: [
         {
@@ -146,6 +148,7 @@ export const menuData: Record<string, MenuItem[]> = {
         },
       ],
     },
+    { name: 'Kokoo (Fried Plantain)', price: '$10.00', description: 'Sweet ripe plantains fried until golden and caramelised. Soft inside with a lightly crisp edge.', image: null },
     { name: 'Spring Rolls', price: '$7.00', description: 'Golden rolls packed with seasoned vegetables and local spices, served with a tangy chilli dipping sauce.', image: '/media/spring-rolls.jpg' },
     { name: 'Kosua ne Meko', price: '$5.00', description: 'A boiled egg paired with fiery Ghanaian chilli sauce. Creamy richness followed by a spicy kick.', image: '/media/egg-chilli.jpg' },
     {
@@ -234,11 +237,31 @@ export const menuData: Record<string, MenuItem[]> = {
         },
       ],
     },
+    {
+      name: 'Banku or Kenkey with Fish', price: '$30.00', image: '/media/banku-tilapia.jpg',
+      description: 'Soft, tangy fermented corn and cassava dough served with grilled tilapia or fried fish and assorted chillies.',
+      options: [
+        {
+          id: 'swallow', label: 'Banku or Kenkey?', effect: 'no-cost',
+          choices: [
+            { id: 'banku', label: 'Banku' },
+            { id: 'kenkey', label: 'Kenkey' },
+          ],
+        },
+        {
+          id: 'fish', label: 'Choose your fish', effect: 'no-cost',
+          choices: [
+            { id: 'grilled-tilapia', label: 'Grilled tilapia' },
+            { id: 'fried-fish', label: 'Fried fish' },
+          ],
+        },
+      ],
+    },
     { name: 'Egusi Stew', price: '$30.00', description: 'Ground melon seeds simmered into a thick, nutty stew with tomatoes, peppers, leafy greens and tender meat or fish.', image: null, options: [SWALLOW_CHOICE] },
   ]),
 
   grill: buildSection('grill', [
-    { name: 'Grilled Tilapia', price: '$25.00', description: 'Whole tilapia marinated in herbs, spices, garlic and ginger, then grilled to smoky perfection. Crispy outside, tender within.', image: '/media/banku-tilapia.jpg' },
+    { name: 'Grilled Tilapia', price: '$25.00', description: 'Whole tilapia marinated in herbs, spices, garlic and ginger, then grilled to smoky perfection. Crispy outside, tender within.', image: null },
     { name: 'Grilled Barramundi', price: '$35.00', description: 'Fresh barramundi seasoned with herbs and spices and grilled until crisp outside and juicy inside.', image: null },
   ]),
 
